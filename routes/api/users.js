@@ -71,23 +71,20 @@ router.post("/users/login", function(req, res, next) {
 
 router.post("/users", function(req, res, next) {
  
+    const username = req.body.username,
+    email = req.body.email,
+    hash= req.body.password;
 
-    // const username = req.body.user.username;
-    // const email = req.body.user.email;
-    // const password = req.body.user.password;
-
-    
-
-    User.create({ username:'Evano', email:'email@mine.com', hash:'llljdhhhdd'})
+    User.create({ username, email, hash})
     .then(function(user){
-        return res.json({ user });
+        return res.status(201).json({ 
+            email: user.email,
+            token: 'This feature is yet to be developed',
+            username: user.username,
+            bio: user.bio || `Hi ${user.username}, please update your profile`,
+            image: user.image || `Don't forget to upload your profile image`,
+        });
     }).catch(next);
-
-    // user.save()
-    //     .then(function() {
-    //         return res.json({ user: user.toAuthJSON() });
-    //     })
-    //     .catch(next);
 });
 
 module.exports = router;
