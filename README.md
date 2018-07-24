@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/andela/rivendell-ah.svg?branch=staging)](https://travis-ci.org/andela/rivendell-ah)
+
 Authors Haven - A Social platform for the creative at heart.
 =======
 
