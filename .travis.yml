@@ -3,6 +3,10 @@ language: node_js
 node_js:
   - "stable"
 
+before_script:
+ - npm install -g sequelize-cli
+ - psql -c 'create database AuthorsHavenTest;' -U postgres
+
 script:
   - npm test
   - npm run coverage
