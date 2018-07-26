@@ -1,7 +1,6 @@
-const crypto = require("crypto");
-const secret = require("../config").secret;
+import crypto  from "crypto";
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     username: {
       type: DataTypes.STRING,
@@ -40,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
 
   }, {
       hooks: {
-        beforeCreate: function (user) {
+        beforeCreate: (user) => {
           user.salt = crypto.randomBytes(16).toString("hex");
           user.hash = crypto
             .pbkdf2Sync(user.hash, user.salt, 10000, 512, "sha512")
