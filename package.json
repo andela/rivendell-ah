@@ -8,15 +8,6 @@
     "test": "cross-env NODE_ENV=test mocha ./test/**/*.js",
     "coverage": "cross-env NODE_ENV=test ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha"
   },
-  "nyc": {
-    "reporter": [
-      "lcov",
-      "text",
-      "html"
-    ],
-    "sourceMap": false,
-    "instrument": false
-  },
   "author": "Andela Simulations Programme",
   "license": "MIT",
   "dependencies": {
@@ -49,7 +40,6 @@
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",
     "istanbul": "^0.4.5",
-    "mocha": "^5.2.0",
-    "nyc": "^12.0.2"
+    "mocha": "^5.2.0"
   }
 }
