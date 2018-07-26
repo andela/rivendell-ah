@@ -11,6 +11,8 @@ const fs = require("fs"),
 
 const isProduction = process.env.NODE_ENV === "production";
 
+require('dotenv').config();
+
 // Create global app object
 const app = express();
 

@@ -4,9 +4,18 @@
   "description": "A Social platform for the creative at heart",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test nyc mocha ./test/**/*.js --exit",
-    "coverage": "nyc report --reporter=text-lcov > coverage.lcov",
-    "start": "node index.js"
+    "start": "node index.js",
+    "test": "cross-env NODE_ENV=test nyc mocha ./test/**/*.js",
+    "report-coverage": "cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage"
+  },
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text",
+      "html"
+    ],
+    "sourceMap": false,
+    "instrument": false
   },
   "author": "Andela Simulations Programme",
   "license": "MIT",
@@ -37,6 +46,7 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
+    "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",
     "mocha": "^5.2.0",
     "nyc": "^12.0.2"
