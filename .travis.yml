@@ -8,4 +8,5 @@ script:
   - npm run coverage
 
 after_script: 
-  - npm run report-coverage
+  - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage
+  
