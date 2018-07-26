@@ -4,7 +4,8 @@
   "description": "A Social platform for the creative at heart",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"no test specified\" && exit 0",
+    "test": "cross-env NODE_ENV=test nyc mocha ./test/**/*.js --exit",
+    "coverage": "nyc report --reporter=text-lcov > coverage.lcov",
     "start": "node index.js"
   },
   "author": "Andela Simulations Programme",
@@ -32,5 +33,12 @@
     "sequelize": "^4.38.0",
     "slug": "^0.9.1",
     "underscore": "^1.9.1"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "cross-env": "^5.2.0",
+    "mocha": "^5.2.0",
+    "nyc": "^12.0.2"
   }
 }
