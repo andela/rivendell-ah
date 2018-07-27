@@ -9,6 +9,8 @@ const fs = require("fs"),
     passport = require("passport"),
     errorhandler = require("errorhandler");
 
+require('dotenv').config();
+
 const isProduction = process.env.NODE_ENV === "production";
 
 // Create global app object
@@ -54,11 +56,10 @@ app.use(function(req, res, next) {
 // will print stacktrace
 if (!isProduction) {
     app.use(function(err, req, res, next) {
-        console.log(err.stack);
+        if(process.env.NODE_ENV !== 'test') console.log(err.stack);
 
-        res.status(err.status || 500);
-
-        res.json({
+        return res.status(err.status || 500)
+        .json({
             errors: {
                 message: err.message,
                 error: err
@@ -83,3 +84,6 @@ app.use(function(err, req, res, next) {
 const server = app.listen(process.env.PORT || 3000, function() {
     console.log("Listening on port " + server.address().port);
 });
+
+// Export express app for testing purposes
+module.exports = app;
