@@ -2,14 +2,19 @@ const fs = require("fs"),
     http = require("http"),
     path = require("path"),
     methods = require("methods"),
+    express = require("express"),
+    bodyParser = require("body-parser"),
     session = require("express-session"),
     cors = require("cors"),
     passport = require("passport"),
     errorhandler = require("errorhandler");
 
+require('dotenv').config();
+
 const isProduction = process.env.NODE_ENV === "production";
 
-require('dotenv').config();
+// Create global app object
+const app = express();
 
 app.use(cors());
 
@@ -79,3 +84,6 @@ app.use(function(err, req, res, next) {
 const server = app.listen(process.env.PORT || 3000, function() {
     console.log("Listening on port " + server.address().port);
 });
+
+// Export express app for testing purposes
+module.exports = app;
