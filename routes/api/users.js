@@ -1,7 +1,6 @@
-const mongoose = require("mongoose");
 const router = require("express").Router();
 const passport = require("passport");
-const User = mongoose.model("User");
+const User = require("../../models/").User;
 
 router.get("/user", function(req, res, next) {
     User.findById(req.payload.id)
@@ -71,17 +70,18 @@ router.post("/users/login", function(req, res, next) {
 });
 
 router.post("/users", function(req, res, next) {
-    const user = new User();
+    const username = req.body.user.username,
+    email = req.body.user.email,
+    hash = req.body.user.password;
 
-    user.username = req.body.user.username;
-    user.email = req.body.user.email;
-    user.setPassword(req.body.user.password);
+    User.create({ username, email, hash})
+    .then(function(user){
+        return res.json({
+            email: user.email,
+            username: user.username
+        });
+    }).catch(next);
 
-    user.save()
-        .then(function() {
-            return res.json({ user: user.toAuthJSON() });
-        })
-        .catch(next);
 });
 
 module.exports = router;
