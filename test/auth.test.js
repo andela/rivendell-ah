@@ -1,4 +1,3 @@
-
 import chai, { expect, use, request } from 'chai';
 import { describe, it, before } from 'mocha';
 import faker, { internet, name, random } from 'faker';
@@ -16,24 +15,24 @@ use(chaiHttp);
 const tempUser = {
   user: {
     username: 'usename10101111',
-    email: 'email@email.com',
-    password: internet.password()
+    email: 'thisafakeemail@email.com',
+    password: '11qQw@123'
   }
 };
 describe('user test', () => {
   describe('user on signing up', () => {
     describe('signing up with no username', () => {
-      it('should return a 500 status code without token', (done) => {
+      it('should return a 400 status code without token', (done) => {
         request(server)
           .post(SIGN_UP_ROUTE)
           .send({
             user: {
-              email: internet.email(),
-              password: internet.password(),
+              email: 'testmail@mail.com',
+              password: '1qQw@123',
             },
           })
           .end((err, res) => {
-            expect(res.status).to.equal(500);
+            expect(res.status).to.equal(400);
             expect(res.body)
               .to.not.have.property('data');
             done();
@@ -43,17 +42,17 @@ describe('user test', () => {
 
 
     describe('signing up with no email', () => {
-      it('should return a 500 status code without token', (done) => {
+      it('should return a 400 status code without token', (done) => {
         request(server)
           .post(SIGN_UP_ROUTE)
           .send({
             user: {
               username: name.lastName() + Date.now(),
-              password: internet.password(),
+              password: '1qQw@123',
             },
           })
           .end((err, res) => {
-            expect(res.status).to.equal(500);
+            expect(res.status).to.equal(400);
             expect(res.body)
               .to.not.have.property('data');
             done();
@@ -62,17 +61,17 @@ describe('user test', () => {
     });
 
     describe('signing up with no password', () => {
-      it('should return a 500 status code without token', (done) => {
+      it('should return a 400 status code without token', (done) => {
         request(server)
           .post(SIGN_UP_ROUTE)
           .send({
             user: {
               username: name.lastName() + Date.now(),
-              email: internet.email(),
+              email: 'testmail@mail.com',
             },
           })
           .end((err, res) => {
-            expect(res.status).to.equal(500);
+            expect(res.status).to.equal(400);
             expect(res.body)
               .to.not.have.property('data');
             done();
@@ -88,15 +87,15 @@ describe('user test', () => {
             .post(SIGN_UP_ROUTE)
             .send({
               user: {
-                email: internet.email(),
+                email: 'testmail@mail.com',
                 username: `validUser1010${Date.now()}`,
-                password: internet.password(),
+                password: '1qQw@123',
               },
             })
             .end((err, res) => {
               expect(res.status).to.equal(201);
-              expect(res.body).to.haveOwnProperty('data');
-              expect(res.body.data).to.haveOwnProperty('token');
+              expect(res.body).to.haveOwnProperty('user');
+              expect(res.body.user).to.haveOwnProperty('token');
               done();
             });
         });
@@ -120,8 +119,8 @@ describe('user test', () => {
           .post(LOGIN_ROUTE)
           .send({
             user: {
-              email: internet.email(),
-              password: internet.password(),
+              email: 'testmail@mail.com',
+              password: '1qQw@123',
             },
           })
           .end((err, res) => {
@@ -138,7 +137,7 @@ describe('user test', () => {
           .post(LOGIN_ROUTE)
           .send({
             user: {
-              email: internet.email(),
+              email: 'testmail@mail.com',
               username: name.lastName() + Date.now(),
             },
           })
@@ -158,7 +157,7 @@ describe('user test', () => {
           .send({
             user: {
               username: name.lastName() + Date.now(),
-              password: internet.password(),
+              password: '1qQw@123',
             },
           })
           .end((err, res) => {
@@ -212,8 +211,8 @@ describe('user test', () => {
             .send({
               user: {
                 username: name.lastName() + Date.now(),
-                password: internet.password(),
-                email: internet.email(),
+                password: '1qQw@123',
+                email: 'testmaily@mail.com',
               },
             })
             .end((err, res) => {
@@ -232,8 +231,8 @@ describe('user test', () => {
             .send(tempUser)
             .end((err, res) => {
               expect(res.status).to.equal(200);
-              expect(res.body).to.haveOwnProperty('data');
-              expect(res.body.data).to.haveOwnProperty('token');
+              expect(res.body).to.haveOwnProperty('user');
+              expect(res.body.user).to.haveOwnProperty('token');
               done();
             });
         });

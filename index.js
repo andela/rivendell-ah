@@ -23,9 +23,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride());
 app.use(express.static(`${__dirname}/public`));
+
 app.use(
   session({
-    secret: 'authorshaven',
+    secret: process.env.SESSION_SECRET,
     cookie: { maxAge: 60000 },
     resave: false,
     saveUninitialized: false,
@@ -64,7 +65,7 @@ if (!isProduction) {
 
 // production error handler
 // no stacktraces leaked to user
-
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.json({

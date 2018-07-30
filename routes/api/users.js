@@ -3,11 +3,12 @@ import { Router } from 'express';
 import models from '../../models';
 import tokenService from '../../services/tokenService';
 import verificationHelper from '../../helpers/verificationHelper';
+import validate from '../../middleware/validator/users';
 
 const { User } = models;
-
-
 const router = Router();
+
+
 router.get('/user', (req, res, next) => {
   User.findById(req.payload.id)
     .then((user) => {
@@ -27,11 +28,10 @@ router.put('/user', (req, res, next) => {
       }
       const user = foundUser;
       const {
-        username, password, email,
-        bio, image,
+        username, email, bio, image, password,
       } = req.body.user;
 
-      // only update fields that were actually passed...
+      // only update fields that were actually passed..
       if (!username) {
         user.username = username;
       }
@@ -83,7 +83,7 @@ router.post('/users/login', (req, res, next) => {
 
         const token = tokenService.generateToken(payload, '3d');
         return res.status(200).json({
-          data: {
+          user: {
             email: user.email,
             username: user.username,
             token,
@@ -96,9 +96,10 @@ router.post('/users/login', (req, res, next) => {
   )(req, res, next);
 });
 
-router.post('/users', (req, res, next) => {
-  const { username, email, password: hash } = req.body.user;
-
+router.post('/users', validate, (req, res, next) => {
+  const {
+    username, email, password: hash,
+  } = req.body.user;
   User.create({ username, email, hash })
   // return the user and a promise call to send the verification email
     .then(user => (
@@ -111,7 +112,7 @@ router.post('/users', (req, res, next) => {
       const token = tokenService.generateToken(payload, '3d');
 
       res.status(201).json({
-        data: {
+        user: {
           email: user.email,
           username: user.username,
           token,
