@@ -1,7 +1,8 @@
 import passport from 'passport';
 import { Router } from 'express';
-import { User } from '../../models';
+import models from '../../models';
 
+const { User } = models;
 const router = Router();
 router.get('/user', (req, res, next) => {
   User.findById(req.payload.id)
@@ -22,7 +23,7 @@ router.put('/user', (req, res, next) => {
       }
       const user = newUser;
       const {
-        username, email, bio, image,
+        username, email, bio, image, password,
       } = req.body.user;
 
       // only update fields that were actually passed...
