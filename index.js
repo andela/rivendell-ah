@@ -1,92 +1,87 @@
-const fs = require("fs"),
-  http = require("http"),
-  path = require("path"),
-  methods = require("methods"),
-  express = require("express"),
-  bodyParser = require("body-parser"),
-  session = require("express-session"),
-  cors = require("cors"),
-  passport = require("passport"),
-  errorhandler = require("errorhandler");
+import session from 'express-session';
+import express from 'express';
+import bodyParser from 'body-parser';
+import cors from 'cors';
+import errorhandler from 'errorhandler';
+import methodOverride from 'method-override';
+import morgan from 'morgan';
+import routes from './routes';
+import {} from './models/User';
+import {} from 'dotenv/config';
+import {} from './config/passport';
 
-require('dotenv').config();
-
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === 'production';
 
 // Create global app object
 const app = express();
 
-app.use(cors());
-
 // Normal express config defaults
-app.use(require("morgan")("dev"));
+app.use(cors());
+app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-app.use(require("method-override")());
-app.use(express.static(__dirname + "/public"));
-
+app.use(methodOverride());
+app.use(express.static(`${__dirname}/public`));
 app.use(
   session({
-    secret: "authorshaven",
+    secret: 'authorshaven',
     cookie: { maxAge: 60000 },
     resave: false,
-    saveUninitialized: false
-  })
+    saveUninitialized: false,
+  }),
 );
 
 if (!isProduction) {
   app.use(errorhandler());
 }
+app.use(routes);
 
-require("./models/User");
-
-app.use(require("./routes"));
-
-/// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  const err = new Error("Not Found");
+// / catch 404 and forward to error handler
+app.use((req, res, next) => {
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
-
-/// error handlers
-
+/* eslint-disable */
+// error handlers
 // development error handler
 // will print stacktrace
 if (!isProduction) {
-  app.use(function (err, req, res, next) {
-    // do not log errors on test environment, returning it is good enough
-    if(process.env.NODE_ENV !== 'test') console.log(err.stack);
+  app.use((err, req, res, next) => {
+    // do not log errors on test environment, 
+    // returning it is good enough
+    if (process.env.NODE_ENV !== 'test') console.log(err.stack);
     return res.status(err.status || 500)
       .json({
         errors: {
           message: err.message,
-          error: err
-        }
+          error: err,
+        },
       });
   });
 }
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.json({
     errors: {
       message: err.message,
-      error: {}
-    }
+      error: {},
+    },
   });
 });
 
+
 // finally, let's start our server...
-// do not open a port on test environment, this will be taken care of by mocha
-if(process.env.NODE_ENV !== 'test') {
-  const server = app.listen(process.env.PORT || 3000, function () {
-    console.log("Listening on port " + server.address().port);
+// do not open a port on test environment,
+// this will be taken care of by mocha
+if (process.env.NODE_ENV !== 'test') {
+  const server = app.listen(process.env.PORT || 3000, () => {
+    console.log(`Listening on port ${server.address().port}`);
   });
 }
-
+/* eslint-disable */
 // export express app for testing
 module.exports = app;
