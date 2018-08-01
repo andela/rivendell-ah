@@ -70,6 +70,7 @@ router.post("/users/login", function(req, res, next) {
 });
 
 router.post("/users", function(req, res, next) {
+    console.log(req.body.user)
     const username = req.body.user.username,
     email = req.body.user.email,
     hash = req.body.user.password;
