@@ -1,5 +1,4 @@
 /* eslint-disable object-shorthand */
-
 const nodemailer = require('nodemailer');
 
 let nodemailerConfig;
@@ -27,12 +26,12 @@ const transporter = nodemailer.createTransport(nodemailerConfig);
 
 module.exports = {
   /**
-   * Create mail options used for configuring nodmailer emails
-   * @param {String} recipient - the email address of the user
-   * @param {String} subject - the subject of the email
-   * @param {String} html - the body of the email
-   * @returns {Object} mailing options
-   */
+  * Create mail options used for configuring nodmailer emails
+  * @param {String} recipient - the email address of the user
+  * @param {String} subject - the subject of the email
+  * @param {String} html - the body of the email
+  * @returns {Object} mailing options
+  */
   mailOptions(recipient, subject, html) {
     return {
       from: 'no-reply@authors-haven.com',
@@ -42,11 +41,14 @@ module.exports = {
     };
   },
   /**
-   * Send email
-   * @param {Object} mailOptions - mailing options
-   * @returns {Promise} send mail
-   */
+  * Send email
+  * @param {Object} mailOptions - mailing options
+  * @returns {Promise} send mail
+  */
   sendMail(mailOptions) {
+    if (process.env.NODE_ENV === 'test') {
+      return new Promise(resolve => resolve(null));
+    }
     return transporter.sendMail(mailOptions);
   },
 };

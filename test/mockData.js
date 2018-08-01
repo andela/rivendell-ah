@@ -11,8 +11,17 @@ const mockData = {
   },
   user3: {
     username: 'naruto',
-    email: 'naruto@gmail.com'
-  }
+    email: 'naruto@gmail.com',
+  },
+  user4: {
+    username: 'fattylee',
+    email: 'fattty@gmail.com',
+  },
+  user5: {
+    username: 'unknown',
+    email: 'unknown@gmail.com',
+  },
+
 };
 
 export default mockData;

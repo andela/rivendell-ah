@@ -4,10 +4,12 @@ import models from '../../models';
 import tokenService from '../../services/tokenService';
 import verificationHelper from '../../helpers/verificationHelper';
 import validate from '../../middleware/validator/users';
+import emailService from '../../services/emailService';
+import hashPassowrd from '../../services/passwordHashService';
+import emailTemplates from '../../services/emailTemplates';
 
 const { User } = models;
 const router = Router();
-
 
 router.get('/user', (req, res, next) => {
   User.findById(req.payload.id)
@@ -96,12 +98,12 @@ router.post('/users/login', (req, res, next) => {
   )(req, res, next);
 });
 
-router.post('/users', validate, (req, res, next) => {
+router.post('/users', validate.signup, (req, res, next) => {
   const {
     username, email, password: hash,
   } = req.body.user;
   User.create({ username, email, hash })
-  // return the user and a promise call to send the verification email
+    // return the user and a promise call to send the verification email
     .then(user => (
       { sendMail: verificationHelper.sendVerificationEmail(user), user }))
     .then(({ user }) => {
@@ -170,5 +172,77 @@ router.post('/users/verify/resend-email', (req, res, next) => {
     .catch(next);
   return null;
 });
+
+router.post(
+  '/users/forgot-password',
+  validate.forgotPassword, (req, res, next) => {
+    const { email } = req.body.user;
+    User.findOne({
+      where: { email },
+    })
+      .then((user) => {
+        if (!user) {
+          return res.status(404)
+            .json({ errors: { message: 'User not found!' } });
+        }
+        const token = tokenService
+          .generateToken({ id: user.id, username: user.username }, 60 * 30);
+        let url = `${process.env.BASEURL}`;
+        url += `/api/users/reset-password?token=${token}`;
+        const mailOptions = emailService.mailOptions(
+          user.email,
+          "Authors Heaven's account token",
+          emailTemplates.resetPasswordTemplate(url, user),
+        );
+        emailService.sendMail(mailOptions)
+          .then(() => res.status(200).json({
+            message: 'Check your email for password reset token',
+          }))
+          .catch(next);
+        return null;
+      })
+      .catch(next);
+    return null;
+  },
+);
+
+router.get('/users/reset-password', (req, res) => {
+  const { token } = req.query;
+  const decoded = tokenService.verifyToken(token);
+
+  if (!decoded) {
+    return res.status(401)
+      .json({ errors: { message: 'Invalid token' } });
+  }
+
+  return res.status(200)
+    .json({
+      message: 'Verification Successful, You can now reset your password',
+    });
+});
+
+router.put(
+  '/users/reset-password',
+  validate.resetPassowrd, (req, res, next) => {
+    const { resetToken, password } = req;
+
+    User.findOne({ where: { id: resetToken.id } })
+      .then((user) => {
+        if (user) {
+          user.update({ hash: hashPassowrd(password, user.salt) })
+            .then(result => res.status(200)
+              .json({
+                username: result.username, message: 'Password updated!',
+              }));
+        } else {
+          return res.status(400)
+            .json({ errors: { message: 'User not found' } });
+        }
+        return null;
+      })
+      .catch(next);
+    return null;
+  },
+);
 
 export default router;

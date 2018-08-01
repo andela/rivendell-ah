@@ -49,9 +49,11 @@ app.use((req, res, next) => {
 // development error handler
 // will print stacktrace
 if (!isProduction) {
+  /* eslint-disable no-unused-vars */
   app.use((err, req, res, next) => {
     // do not log errors on test environment,
     // returning it is good enough
+    /* eslint-disable no-console */
     if (process.env.NODE_ENV !== 'test') console.log(err.stack);
     return res.status(err.status || 500)
       .json({
@@ -82,6 +84,7 @@ app.use((err, req, res, next) => {
 // this will be taken care of by mocha
 if (process.env.NODE_ENV !== 'test') {
   const server = app.listen(process.env.PORT || 3000, () => {
+    /* eslint-disable no-console */
     console.log(`Listening on port ${server.address().port}`);
   });
 }
