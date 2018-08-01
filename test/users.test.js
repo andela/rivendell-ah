@@ -13,7 +13,7 @@ require('dotenv').config();
 const { expect } = chai;
 chai.use(chaiHttp);
 
-const baseUrl = '/api/users/';
+const baseUrl = '/v1/api/users/';
 
 describe('Testing user routes', () => {
   after((done) => {
@@ -40,7 +40,7 @@ describe('Testing user routes', () => {
     });
   });
 
-  describe('Navigating to verification route(/api/user/verify/:token)', () => {
+  describe('Navigating to verification route(/v1/api/user/verify/:token)', () => {
     it('Should not verify user if token is invalid', (done) => {
       chai.request(server)
         .get(`${baseUrl}verify/invalid-token`)

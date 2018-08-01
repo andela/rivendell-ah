@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 export default (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+  const User = sequelize.define('User', { // eslint-disable-line import/named
     username: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -44,14 +44,14 @@ export default (sequelize, DataTypes) => {
   }, {
     hooks: {
       beforeCreate: (user) => {
-        user.salt = crypto.randomBytes(16).toString('hex');
-        user.hash = crypto // eslint-disable-next-line no-param-reassign
-          .pbkdf2Sync(user.hash, user.salt, 10000, 512, 'sha512')
+        user.salt = crypto.randomBytes(16).toString('hex'); // eslint-disable-line no-param-reassign
+        user.hash = crypto // eslint-disable-line no-param-reassign
+          .pbkdf2Sync(user.hash, user.salt, 10000, 512, 'sha512') // eslint-disable-line no-param-reassign
           .toString('hex');
       },
     },
   });
-  User.associate = (models) => {
+  User.associate = (models) => { // eslint-disable-line no-unused-vars
 
   };
 
