@@ -2,13 +2,28 @@
   "name": "rivendell-ah",
   "description": "",
   "scripts": {
+    "postdeploy": "npm run migrate"
   },
   "env": {
+    "env": {
+      "DATABASE_URL": {
+        "value": "postgres://ophokupf:ifLylknuqZZkhEZN2ZTl7e9kCzXfyL4r@pellefant.db.elephantsql.com:5432/ophokupf",
+        "required": true
+      },
+      "DATABASE_URL_DEV": {
+        "required": true
+      },
+      "DATABASE_URL_TEST": {
+        "required": true
+      },
+      "HEROKU_APP_NAME": {
+        "required": true
+      }
+    }
   },
   "formation": {
   },
   "addons": [
-
   ],
   "buildpacks": [
     {

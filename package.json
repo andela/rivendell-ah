@@ -3,11 +3,17 @@
   "version": "1.0.0",
   "description": "A Social platform for the creative at heart",
   "main": "index.js",
+  "engines": {
+    "node": "8.11.3",
+    "npm": "5.6.0"
+  },
   "scripts": {
     "start": "node index.js",
+    "start:dev": "nodemon --exec node index.js",
     "test": "cross-env NODE_ENV=test mocha ./test/**/*.js",
     "coverage": "cross-env NODE_ENV=test ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "migrate": "sequelize db:migrate"
   },
   "author": "Andela Simulations Programme",
   "license": "MIT",
@@ -26,12 +32,14 @@
     "mongoose": "^5.2.2",
     "mongoose-unique-validator": "^2.0.1",
     "morgan": "^1.9.0",
+    "nodemon": "^1.18.3",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pg": "^7.4.3",
     "pg-hstore": "^2.3.2",
     "request": "^2.87.0",
     "sequelize": "^4.38.0",
+    "sequelize-cli": "^4.0.0",
     "slug": "^0.9.1",
     "underscore": "^1.9.1"
   },
