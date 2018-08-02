@@ -1,4 +1,6 @@
 
+/* eslint no-param-reassign: off */
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Users', {

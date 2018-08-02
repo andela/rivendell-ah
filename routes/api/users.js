@@ -6,6 +6,7 @@ import verificationHelper from '../../helpers/verificationHelper';
 
 const { User } = models;
 
+
 const router = Router();
 router.get('/user', (req, res, next) => {
   User.findById(req.payload.id)
@@ -20,13 +21,14 @@ router.get('/user', (req, res, next) => {
 
 router.put('/user', (req, res, next) => {
   User.findById(req.payload.id)
-    .then((newUser) => {
-      if (!newUser) {
+    .then((foundUser) => {
+      if (!foundUser) {
         return res.sendStatus(401);
       }
-      const user = newUser;
+      const user = foundUser;
       const {
-        username, email, bio, image,
+        username, password, email,
+        bio, image,
       } = req.body.user;
 
       // only update fields that were actually passed...
@@ -37,7 +39,7 @@ router.put('/user', (req, res, next) => {
         user.email = email;
       }
       if (!bio) {
-        user.bio = req.body.user.bio;
+        user.bio = bio;
       }
       if (!image) {
         user.image = image;
@@ -45,52 +47,78 @@ router.put('/user', (req, res, next) => {
       if (!password) {
         user.setPassword(req.body.user.password);
       }
-      return user.save().then(() => res.json({ user: newUser.toAuthJSON() }));
+
+      return user.save().then(() => res.json({ user: user.toAuthJSON() }));
     })
     .catch(next);
 });
 
 router.post('/users/login', (req, res, next) => {
+  if (!req.body.user) {
+    return res.status(422).json({ errors: { user: 'must be an object' } });
+  }
+
+  if (!req.body.user.username) {
+    return res.status(422).json({ errors: { username: 'can\'t be blank' } });
+  }
   if (!req.body.user.email) {
-    return res.status(422).json({ errors: { email: "can't be blank" } });
+    return res.status(422).json({ errors: { email: 'can\'t be blank' } });
   }
+
   if (!req.body.user.password) {
-    return res.status(422).json({ errors: { password: "can't be blank" } });
+    return res.status(422).json({ errors: { password: 'can\'t be blank' } });
   }
-  passport.authenticate('local', { session: false }, (
-    err,
-    user,
-    info,
-  ) => {
-    if (err) {
-      return next(err);
-    }
-    if (user) {
-      return res.json({
-        email: user.email,
-        username: user.username,
-      });
-    }
-    return res.status(422).json(info);
-  })(req, res, next);
-  return undefined;
+  return passport.authenticate(
+    'local', { session: false },
+    (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
+
+      if (user) {
+        const payload = {
+          username: user.username,
+          email: user.email,
+        };
+
+        const token = tokenService.generateToken(payload, '3d');
+        return res.status(200).json({
+          data: {
+            email: user.email,
+            username: user.username,
+            token,
+          },
+        });
+      }
+      return res.status(422)
+        .json(info);
+    },
+  )(req, res, next);
 });
 
 router.post('/users', (req, res, next) => {
-  const { username, email } = req.body.user;
-  const hash = req.body.user.password;
+  const { username, email, password: hash } = req.body.user;
 
   User.create({ username, email, hash })
   // return the user and a promise call to send the verification email
     .then(user => (
       { sendMail: verificationHelper.sendVerificationEmail(user), user }))
-    .then(({ user }) => res.status(201).json({
-      user: {
+    .then(({ user }) => {
+      const payload = {
         username: user.username,
         email: user.email,
-      },
-      message: 'Sign up successful, visit your email to verify your account.',
-    }))
+      };
+      const token = tokenService.generateToken(payload, '3d');
+
+      res.status(201).json({
+        data: {
+          email: user.email,
+          username: user.username,
+          token,
+        },
+        message: 'Sign up successful, visit your email to verify your account.',
+      });
+    })
     .catch(next);
 });
 

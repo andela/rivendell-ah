@@ -1,8 +1,9 @@
-const tokenService = require('../services/tokenService');
-const emailService = require('../services/emailService');
-const emailTemplates = require('../services/emailTemplates');
 
-module.exports = {
+import emailService from '../services/emailService';
+import emailTemplates from '../services/emailTemplates';
+import tokenService from '../services/tokenService';
+
+export default {
   /**
    * Send verification to a user on sign up
    * @param {Object} user - user retrieved from the database

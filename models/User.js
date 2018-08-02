@@ -1,3 +1,5 @@
+
+/* eslint no-param-reassign: off */
 import crypto from 'crypto';
 
 export default (sequelize, DataTypes) => {
@@ -51,9 +53,7 @@ export default (sequelize, DataTypes) => {
       },
     },
   });
-  User.associate = (models) => {
-
-  };
+  User.associate = () => {};
 
   return User;
 };
