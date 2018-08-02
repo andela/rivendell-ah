@@ -1,7 +1,9 @@
 import passport from 'passport';
 import { Strategy } from 'passport-local';
 import crypto from 'crypto';
-import { User } from '../models/User';
+import models from '../models';
+
+const { User } = models;
 
 const LocalStrategy = Strategy;
 

@@ -6,9 +6,11 @@
   "scripts": {
     "start": "babel-node index.js --exec babel-node",
     "dev": "NODE_ENV=development nodemon ./index.js --exec babel-node",
-    "test": "cross-env NODE_ENV=test mocha --compilers js:babel-core/register ./test/**/*.js",
-    "coverage": "cross-env NODE_ENV=test babel-node ./node_modules/babel-istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "pretest": "npm run posttest && sequelize --env test db:migrate && sequelize --env test db:seed:all",
+    "test": "cross-env NODE_ENV=test nyc mocha --compilers js:babel-core/register ./test/**/*.js",
+    "posttest": "sequelize --env test db:migrate:undo:all",
+    "coverage": "npm run pretest && cross-env NODE_ENV=test babel-node ./node_modules/babel-istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha && npm run posttest"
   },
   "author": "Andela Simulations Programme",
   "license": "MIT",
@@ -25,6 +27,7 @@
     "method-override": "^2.3.10",
     "methods": "^1.1.2",
     "morgan": "^1.9.0",
+    "nodemailer": "^4.6.7",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "pg": "^7.4.3",
@@ -43,13 +46,15 @@
     "chai-http": "^4.0.0",
     "coveralls": "^3.0.2",
     "cross-env": "^5.2.0",
-    "eslint": "^4.19.1",
     "eslint-config-airbnb": "^17.0.0",
-    "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-jsx-a11y": "^6.1.1",
     "eslint-plugin-react": "^7.10.0",
+    "eslint": "^5.2.0",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "faker": "^4.1.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
-    "nodemon": "^1.18.3"
+    "nyc": "^12.0.2"
   }
 }
