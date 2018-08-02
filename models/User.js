@@ -1,7 +1,6 @@
-const crypto = require("crypto");
-const secret = require("../config").secret;
+import crypto from 'crypto';
 
-module.exports = (sequelize, DataTypes) => {
+export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     username: {
       type: DataTypes.STRING,
@@ -18,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
       unique: true,
       required: true,
       validate: {
-        isEmail:true,
+        isEmail: true,
       },
     },
     bio: {
@@ -36,20 +35,21 @@ module.exports = (sequelize, DataTypes) => {
     salt: {
       type: DataTypes.STRING,
       allowNull: true,
-    }
+    },
 
   }, {
-      hooks: {
-        beforeCreate: function (user) {
-          user.salt = crypto.randomBytes(16).toString("hex");
-          user.hash = crypto
-            .pbkdf2Sync(user.hash, user.salt, 10000, 512, "sha512")
-            .toString("hex");
-        }
-      }
-    });
-    User.associate = function(models) {
-    };
-  
+    hooks: {
+      beforeCreate: (user) => {
+        user.salt = crypto.randomBytes(16).toString('hex');
+        user.hash = crypto // eslint-disable-next-line no-param-reassign
+          .pbkdf2Sync(user.hash, user.salt, 10000, 512, 'sha512')
+          .toString('hex');
+      },
+    },
+  });
+  User.associate = (models) => {
+
+  };
+
   return User;
 };

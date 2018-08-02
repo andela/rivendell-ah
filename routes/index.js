@@ -1,5 +1,7 @@
-const router = require("express").Router();
+import { Router } from 'express';
+import apiRouter from './api';
 
-router.use("/api", require("./api"));
+const router = Router();
+router.use('/api', apiRouter);
 
-module.exports = router;
+export default router;
