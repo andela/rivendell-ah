@@ -1,13 +1,14 @@
 /* eslint-disable max-len, prefer-destructuring */
-const chai = require('chai');
-const faker = require('faker');
-const chaiHttp = require('chai-http');
-const server = require('../index');
-const models = require('../models');
-const tokenService = require('../services/tokenService');
-const User = require('../models').User;
-const mockData = require('./mockData');
+import chai from 'chai';
+import faker from 'faker';
+import chaiHttp from 'chai-http';
+import server from '../index';
+import models from '../models';
+import tokenService from '../services/tokenService';
+import { User } from '../models';
+import  mockData from './mockData';
 
+const {user1, user2, user3} = mockData
 require('dotenv').config();
 
 const { expect } = chai;
@@ -65,7 +66,7 @@ describe('Testing user routes', () => {
         });
     });
     it('Should not verify user account if account is already verified', (done) => {
-      User.findOne({ where: { email: mockData.user2.email } })
+      User.findOne({ where: { email: user2.email } })
         .then((user) => {
           const token = tokenService.generateToken({ id: user.id }, 60 * 20);
           return token;
@@ -83,7 +84,7 @@ describe('Testing user routes', () => {
         });
     });
     it('Should verify a user\'s account if the token is valid and the account hasn\'t been verified', (done) => {
-      User.findOne({ where: { email: mockData.user1.email } })
+      User.findOne({ where: { email: user1.email } })
         .then((user) => {
           const token = tokenService.generateToken({ id: user.id }, 60 * 20);
           return token;
@@ -143,7 +144,7 @@ describe('Testing user routes', () => {
       chai.request(server)
         .post(`${baseUrl}verify/resend-email`)
         .send({
-          email: mockData.user3.email
+          email: user3.email
         })
         .end((err, res) => {
           expect(res.status).to.equal(200);

@@ -1,0 +1,242 @@
+
+import chai, { expect, use, request } from 'chai';
+import { describe, it, before } from 'mocha';
+import faker, { internet, name, random } from 'faker';
+import chaiHttp from 'chai-http';
+import server from '../index';
+
+import { sequelize } from '../models';
+
+
+const SIGN_UP_ROUTE = '/api/users';
+const LOGIN_ROUTE = '/api/users/login';
+use(chaiHttp);
+
+
+const tempUser = {
+  user: {
+    username: 'usename10101111',
+    email: 'email@email.com',
+    password: internet.password()
+  }
+};
+describe('user test', () => {
+  describe('user on signing up', () => {
+    describe('signing up with no username', () => {
+      it('should return a 500 status code without token', (done) => {
+        request(server)
+          .post(SIGN_UP_ROUTE)
+          .send({
+            user: {
+              email: internet.email(),
+              password: internet.password(),
+            },
+          })
+          .end((err, res) => {
+            expect(res.status).to.equal(500);
+            expect(res.body)
+              .to.not.have.property('data');
+            done();
+          });
+      });
+    });
+
+
+    describe('signing up with no email', () => {
+      it('should return a 500 status code without token', (done) => {
+        request(server)
+          .post(SIGN_UP_ROUTE)
+          .send({
+            user: {
+              username: name.lastName() + Date.now(),
+              password: internet.password(),
+            },
+          })
+          .end((err, res) => {
+            expect(res.status).to.equal(500);
+            expect(res.body)
+              .to.not.have.property('data');
+            done();
+          });
+      });
+    });
+
+    describe('signing up with no password', () => {
+      it('should return a 500 status code without token', (done) => {
+        request(server)
+          .post(SIGN_UP_ROUTE)
+          .send({
+            user: {
+              username: name.lastName() + Date.now(),
+              email: internet.email(),
+            },
+          })
+          .end((err, res) => {
+            expect(res.status).to.equal(500);
+            expect(res.body)
+              .to.not.have.property('data');
+            done();
+          });
+      });
+    });
+
+
+    describe('signing up with all the required fields', () => {
+      it('should return a 201 status code has a data property with a token',
+        (done) => {
+          request(server)
+            .post(SIGN_UP_ROUTE)
+            .send({
+              user: {
+                email: internet.email(),
+                username: `validUser1010${Date.now()}`,
+                password: internet.password(),
+              },
+            })
+            .end((err, res) => {
+              expect(res.status).to.equal(201);
+              expect(res.body).to.haveOwnProperty('data');
+              expect(res.body.data).to.haveOwnProperty('token');
+              done();
+            });
+        });
+    });
+  });
+
+
+  describe('user on loging in ', () => {
+    before((done) => {
+      request(server)
+        .post(SIGN_UP_ROUTE)
+        .send(tempUser)
+        .end(() => {
+          done();
+        });
+    });
+
+    describe('loging in with no username', () => {
+      it('should not return  a data property', (done) => {
+        request(server)
+          .post(LOGIN_ROUTE)
+          .send({
+            user: {
+              email: internet.email(),
+              password: internet.password(),
+            },
+          })
+          .end((err, res) => {
+            expect(res.body)
+              .to.not.have.property('data');
+            done();
+          });
+      });
+    });
+
+    describe('loging in with no password', () => {
+      it('should not return a data property ', (done) => {
+        request(server)
+          .post(LOGIN_ROUTE)
+          .send({
+            user: {
+              email: internet.email(),
+              username: name.lastName() + Date.now(),
+            },
+          })
+          .end((err, res) => {
+            expect(res.body)
+              .to.not.have.property('data');
+            done();
+          });
+      });
+    });
+
+
+    describe('loging in with no email', () => {
+      it('should not return a data property ', (done) => {
+        request(server)
+          .post(LOGIN_ROUTE)
+          .send({
+            user: {
+              username: name.lastName() + Date.now(),
+              password: internet.password(),
+            },
+          })
+          .end((err, res) => {
+            expect(res.body)
+              .to.not.have.property('data');
+            done();
+          });
+      });
+    });
+
+
+    describe('loging in a user with an invalid format', () => {
+      describe('if only the user attributes are missing', () => {
+        it('should not return a data property',
+          (done) => {
+            request(server)
+              .post(LOGIN_ROUTE)
+              .send({
+                user: {},
+              })
+              .end((err, res) => {
+                expect(res.body)
+                  .to.not.have.property('data');
+                done();
+              });
+          });
+      });
+
+      describe('if only the user attributes are missing', () => {
+        it('should not return a data property',
+          (done) => {
+            request(server)
+              .post(LOGIN_ROUTE)
+              .send({
+                user: {},
+              })
+              .end((err, res) => {
+                expect(res.body)
+                  .to.not.have.property('data');
+                done();
+              });
+          });
+      });
+    });
+
+    describe('loging in with an invalid user ', () => {
+      it('should return a 200 status code has a data property with a token',
+        (done) => {
+          request(server)
+            .post(LOGIN_ROUTE)
+            .send({
+              user: {
+                username: name.lastName() + Date.now(),
+                password: internet.password(),
+                email: internet.email(),
+              },
+            })
+            .end((err, res) => {
+              expect(res.body)
+                .to.not.have.property('data');
+              done();
+            });
+        });
+    });
+
+    describe('loging in with all the required fields', () => {
+      it('should return a 200 status code has a data property with a token',
+        (done) => {
+          request(server)
+            .post(LOGIN_ROUTE)
+            .send(tempUser)
+            .end((err, res) => {
+              expect(res.status).to.equal(200);
+              expect(res.body).to.haveOwnProperty('data');
+              expect(res.body.data).to.haveOwnProperty('token');
+              done();
+            });
+        });
+    });
+  });
+});

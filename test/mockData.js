@@ -1,4 +1,6 @@
-module.exports = {
+ 
+
+const mockData = {
   user1: {
     username: 'black',
     email: 'johnwick@gmail.com'
@@ -12,3 +14,5 @@ module.exports = {
     email: 'naruto@gmail.com'
   }
 };
+
+export default mockData;

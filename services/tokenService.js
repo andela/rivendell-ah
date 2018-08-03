@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-module.exports = {
+const tokenService = {
   /**
    * Generate a token
    * @param {Object} payload - object to be encoded into a token
@@ -23,3 +23,6 @@ module.exports = {
     }
   },
 };
+
+
+export default tokenService;
