@@ -1,1 +1,1 @@
-web: babel-node index.js
+web: set HTTPS=true && babel-node ./server/index.js
