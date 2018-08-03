@@ -5,7 +5,7 @@ const chaiHttp = require('chai-http');
 const server = require('../index');
 const models = require('../models');
 const tokenService = require('../services/tokenService');
-const User = require('../models').User;
+const Users = require('../models').Users;
 const mockData = require('./mockData');
 
 require('dotenv').config();
@@ -65,7 +65,7 @@ describe('Testing user routes', () => {
         });
     });
     it('Should not verify user account if account is already verified', (done) => {
-      User.findOne({ where: { email: mockData.user2.email } })
+      Users.findOne({ where: { email: mockData.user2.email } })
         .then((user) => {
           const token = tokenService.generateToken({ id: user.id }, 60 * 20);
           return token;
@@ -83,7 +83,7 @@ describe('Testing user routes', () => {
         });
     });
     it('Should verify a user\'s account if the token is valid and the account hasn\'t been verified', (done) => {
-      User.findOne({ where: { email: mockData.user1.email } })
+      Users.findOne({ where: { email: mockData.user1.email } })
         .then((user) => {
           const token = tokenService.generateToken({ id: user.id }, 60 * 20);
           return token;

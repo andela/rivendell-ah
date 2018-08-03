@@ -13,11 +13,7 @@
     "pretest": "npm run posttest && sequelize --env test db:migrate && sequelize --env test db:seed:all",
     "test": "cross-env NODE_ENV=test nyc mocha --compilers js:babel-core/register ./test/**/*.js",
     "posttest": "sequelize --env test db:migrate:undo:all",
-<<<<<<< HEAD
     "coverage": "npm run pretest && cross-env NODE_ENV=test babel-node ./node_modules/babel-istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha && npm run posttest",
-=======
-    "coverage": "cross-env NODE_ENV=test babel-node ./node_modules/babel-istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha",
->>>>>>> chore(app-hosting):create and host app
     "lint": "eslint .",
     "migrate": "sequelize db:migrate",
     "undo:migrate": "sequelize db:migrate:undo:all"

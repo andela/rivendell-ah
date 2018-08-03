@@ -4,10 +4,10 @@ import models from '../../models';
 import tokenService from '../../services/tokenService';
 import verificationHelper from '../../helpers/verificationHelper';
 
-const { User } = models;
+const { Users } = models;
 const router = Router();
 router.get('/user', (req, res, next) => {
-  User.findById(req.payload.id)
+  Users.findById(req.payload.id)
     .then((user) => {
       if (!user) {
         return res.sendStatus(401);
@@ -18,7 +18,7 @@ router.get('/user', (req, res, next) => {
 });
 
 router.put('/user', (req, res, next) => {
-  User.findById(req.payload.id)
+  Users.findById(req.payload.id)
     .then((newUser) => {
       if (!newUser) {
         return res.sendStatus(401);
@@ -79,7 +79,7 @@ router.post('/users', (req, res, next) => {
   const { username, email } = req.body.user;
   const hash = req.body.user.password;
 
-  User.create({ username, email, hash })
+  Users.create({ username, email, hash })
   // return the user and a promise call to send the verification email
     .then(user => (
       { sendMail: verificationHelper.sendVerificationEmail(user), user }))
@@ -100,7 +100,7 @@ router.get('/users/verify/:token', (req, res, next) => {
     return res.status(400)
       .json({ errors: { message: 'The link has expired' } });
   }
-  User.findById(decoded.id)
+  Users.findById(decoded.id)
     .then((user) => {
       const validateUser = verificationHelper.validateUser(user);
       if (!validateUser.status) {
@@ -123,7 +123,7 @@ router.post('/users/verify/resend-email', (req, res, next) => {
   if (!validateEmail.status) {
     return res.status(validateEmail.statusCode).json(validateEmail.error);
   }
-  User.findOne({ where: { email } })
+  Users.findOne({ where: { email } })
     .then((user) => {
       const validateUser = verificationHelper.validateUser(user);
       if (validateUser.status) {

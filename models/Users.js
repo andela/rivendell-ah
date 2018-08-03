@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 
 export default (sequelize, DataTypes) => {
-  const User = sequelize.define('User', { // eslint-disable-line import/named
+  const Users = sequelize.define('Users', { // eslint-disable-line import/named
     username: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -51,9 +51,9 @@ export default (sequelize, DataTypes) => {
       },
     },
   });
-  User.associate = (models) => { // eslint-disable-line no-unused-vars
+  Users.associate = (models) => { // eslint-disable-line no-unused-vars
 
   };
 
-  return User;
+  return Users;
 };

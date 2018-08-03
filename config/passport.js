@@ -3,7 +3,7 @@ import { Strategy } from 'passport-local';
 import crypto from 'crypto';
 import models from '../models';
 
-const { User } = models;
+const { Users } = models;
 const LocalStrategy = Strategy;
 
 passport.use(
@@ -12,7 +12,7 @@ passport.use(
     passwordField: 'user[password]',
   },
   (email, password, done) => {
-    User.findOne({ where: { email } })
+    Users.findOne({ where: { email } })
       .then((user) => {
         const validPassword = (thePassword) => {
           const hash = crypto

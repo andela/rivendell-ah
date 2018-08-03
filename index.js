@@ -6,7 +6,7 @@ import errorhandler from 'errorhandler';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
 import routes from './routes';
-import {} from './models/User';
+import {} from './models/Users';
 import {} from 'dotenv/config';
 import {} from './config/passport';
 
