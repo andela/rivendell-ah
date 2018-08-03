@@ -4,7 +4,6 @@ import crypto from 'crypto';
 import models from '../models';
 
 const { User } = models;
-
 const LocalStrategy = Strategy;
 
 passport.use(

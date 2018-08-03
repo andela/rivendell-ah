@@ -2,17 +2,20 @@
   "name": "rivendell-ah",
   "description": "",
   "scripts": {
+    "postdeploy": "npm run migrate"
   },
   "env": {
+    "DATABASE_URL": {
+      "required": true
+    },
+    "HEROKU_APP_NAME": {
+      "required": true
+    }
   },
   "formation": {
   },
   "addons": [
-
   ],
   "buildpacks": [
-    {
-      "url": "rivendell-ah"
-    }
   ]
 }
