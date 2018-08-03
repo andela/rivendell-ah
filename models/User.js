@@ -6,12 +6,13 @@ export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     username: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: true,
-      required: true,
-      validate: {
-        is: /^[a-zA-Z0-9]+$/i,
-      },
+
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     email: {
       type: DataTypes.STRING,
@@ -51,6 +52,7 @@ export default (sequelize, DataTypes) => {
         user.hash = crypto
           .pbkdf2Sync(user.hash, user.salt, 10000, 512, 'sha512')
           .toString('hex');
+        
       },
     },
   });

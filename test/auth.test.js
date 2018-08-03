@@ -1,11 +1,9 @@
 import chai, { expect, use, request } from 'chai';
+
 import { describe, it, before } from 'mocha';
-import faker, { internet, name, random } from 'faker';
+import { internet, name } from 'faker';
 import chaiHttp from 'chai-http';
 import server from '../index';
-
-import { sequelize } from '../models';
-
 
 const SIGN_UP_ROUTE = '/api/users';
 const LOGIN_ROUTE = '/api/users/login';

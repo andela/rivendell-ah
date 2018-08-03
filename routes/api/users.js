@@ -4,6 +4,7 @@ import models from '../../models';
 import tokenService from '../../services/tokenService';
 import verificationHelper from '../../helpers/verificationHelper';
 import validate from '../../middleware/validator/users';
+import OauthController from '../../controllers/OauthController';
 
 const { User } = models;
 const router = Router();
@@ -106,8 +107,9 @@ router.post('/users', validate, (req, res, next) => {
       { sendMail: verificationHelper.sendVerificationEmail(user), user }))
     .then(({ user }) => {
       const payload = {
-        username: user.username,
+        id: user.id,
         email: user.email,
+        oauth: false,
       };
       const token = tokenService.generateToken(payload, '3d');
 
@@ -170,5 +172,40 @@ router.post('/users/verify/resend-email', (req, res, next) => {
     .catch(next);
   return null;
 });
+
+
+router.get(
+  '/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }),
+);
+
+router.get(
+  '/auth/linkedin',
+  passport.authenticate('linkedin'),
+);
+
+router.get(
+  '/auth/facebook',
+  passport.authenticate('facebook', { scope: ['email'] }),
+);
+
+router.get(
+  '/auth/google/redirect',
+  passport.authenticate('google'),
+  OauthController.handleRedirect,
+);
+
+router.get(
+  '/auth/linkedin/redirect',
+  passport.authenticate('linkedin'),
+  OauthController.handleRedirect,
+);
+
+router.get(
+  '/auth/facebook/redirect',
+  passport.authenticate('facebook', { scope: ['email'] }),
+  OauthController.handleRedirect,
+);
+
 
 export default router;

@@ -2,7 +2,7 @@
 /coverage/**
 /migrations/**
 /seeders/**
+/models/**
 /test/**
-.env
 package-lock.json
 

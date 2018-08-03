@@ -1,10 +1,13 @@
-
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import crypto from 'crypto';
 
-import { User } from '../models'; //eslint-disable-line
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import { Strategy as FacebookStrategy } from 'passport-facebook';
+import { Strategy as LinkedinStrategy } from 'passport-linkedin-oauth2';
 
+import { User, OauthUser } from '../models'; //eslint-disable-line
+import OauthController from '../controllers/OauthController';
 
 passport.use(
   new LocalStrategy(
@@ -36,3 +39,30 @@ passport.use(
     }),
   ),
 );
+
+
+passport.use(new FacebookStrategy({
+  clientID: process.env.FACEBOOK_ID,
+  clientSecret: process.env.FACEBOOK_SECRET,
+  callbackURL: process.env.FACEBOOK_CALLBACK_URL,
+  profileFields: ['id', 'displayName', 'photos', 'email'],
+}, OauthController.passportCallback));
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.GOOGLE_CALLBACK_URL,
+}, OauthController.passportCallback));
+
+
+passport.use(new LinkedinStrategy({
+  clientID: process.env.LINKEDIN_ID,
+  clientSecret: process.env.LINKEDIN_SECRET,
+  callbackURL: '/api/auth/linkedin/redirect',
+  scope: ['r_emailaddress', 'r_basicprofile'],
+}, OauthController.passportCallback));
+
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
