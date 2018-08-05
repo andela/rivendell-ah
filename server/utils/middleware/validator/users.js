@@ -1,4 +1,4 @@
-import models from '../../models';
+import models from '../../../database/models';
 import validator from '../../helpers/validatorHelper';
 import tokenService from '../../services/tokenService';
 

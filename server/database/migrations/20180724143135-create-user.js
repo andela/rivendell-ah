@@ -1,5 +1,4 @@
-
-/* eslint no-param-reassign: off */
+/* eslint-disable */
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -8,7 +7,7 @@ module.exports = {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
       username: {
         type: Sequelize.STRING,
@@ -25,7 +24,7 @@ module.exports = {
         unique: true,
         required: true,
         validate: {
-          isEmail:true,
+          isEmail: true,
         },
       },
       bio: {
@@ -47,15 +46,15 @@ module.exports = {
       verified: {
         type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: false
+        defaultValue: false,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       }
     });
   },

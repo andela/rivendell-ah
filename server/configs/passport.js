@@ -3,7 +3,7 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import crypto from 'crypto';
 
-import { User } from '../models'; //eslint-disable-line
+import { User } from '../database/models'; //eslint-disable-line
 
 
 passport.use(

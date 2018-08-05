@@ -3,10 +3,10 @@ import chai from 'chai'
 import faker from 'faker'
 import chaiHttp from 'chai-http'
 import dotenv from 'dotenv';
-import server from '../index';
-import models from '../models';
-import tokenService from '../services/tokenService';
-import { User } from '../models';
+import server from '../../index';
+import models from '../../database/models';
+import tokenService from '../../utils/services/tokenService';
+import { User } from '../../database/models';
 import mockData from './mockData';
 
 const {user1, user2, user3} = mockData

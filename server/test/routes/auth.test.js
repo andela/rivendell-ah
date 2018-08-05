@@ -1,10 +1,12 @@
+/* eslint-disable */
+
 import chai, { expect, use, request } from 'chai';
 import { describe, it, before } from 'mocha';
 import faker, { internet, name, random } from 'faker';
 import chaiHttp from 'chai-http';
-import server from '../index';
+import server from '../../index';
 
-import { sequelize } from '../models';
+import { sequelize } from '../../database/models';
 
 
 const SIGN_UP_ROUTE = '/api/users';
@@ -16,8 +18,8 @@ const tempUser = {
   user: {
     username: 'usename10101111',
     email: 'thisafakeemail@email.com',
-    password: '11qQw@123'
-  }
+    password: '11qQw@123',
+  },
 };
 describe('user test', () => {
   describe('user on signing up', () => {
