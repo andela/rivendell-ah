@@ -23,13 +23,24 @@ describe('Social Login', () => {
       request(server)
         .get('/api/auth/google')
         .end((err, res) => {
+        console.log(res);
          expect(res)
             .property('status').to.equal(200);
           done();
         });
     }).timeout(50000);
   });
-  
+  describe('when user accesses goggle redirect', () => {
+    it(`should return 400 status`, (done) => {
+      request(server)
+        .get('/api/auth/google/redirect')
+        .end((err, res) => {
+         expect(res)
+            .property('status').to.equal(400);
+          done();
+        });
+    }).timeout(50000);
+  });
   describe('when user tries to login with linkedin', () => {
     it('should redirect the user to linkedin and return 200', (done) => {
       request(server)
