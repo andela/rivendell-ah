@@ -1,12 +1,12 @@
-/* eslint-disable max-len, prefer-destructuring */
-import chai from 'chai';
-import faker from 'faker';
-import chaiHttp from 'chai-http';
+/* eslint-disable */
+import chai from 'chai'
+import faker from 'faker'
+import chaiHttp from 'chai-http'
 import server from '../index';
 import models from '../models';
 import tokenService from '../services/tokenService';
 import { User } from '../models';
-import  mockData from './mockData';
+import mockData from './mockData';
 
 const {user1, user2, user3} = mockData
 require('dotenv').config();
@@ -28,7 +28,7 @@ describe('Testing user routes', () => {
         .send({
           user: {
             username: 'username',
-            password: '12345678',
+            password: 'R!vendell12',
             email: 'username12@gmail.com'
           }
         })
@@ -53,7 +53,7 @@ describe('Testing user routes', () => {
           done();
         });
     });
-    it('Should not verify user account if user is not registered (not in the database)', (done) => {
+    it('Should not verify user account if user is not registered (not in the userbase)', (done) => {
       const token = tokenService.generateToken({ id: 0 }, 60 * 20);
       chai.request(server)
         .get(`${baseUrl}verify/${token}`)
@@ -126,7 +126,7 @@ describe('Testing user routes', () => {
           done();
         });
     });
-    it('Should not resend email if provided email dose not exist in the database', (done) => {
+    it('Should not resend email if provided email dose not exist in the userbase', (done) => {
       chai.request(server)
         .post(`${baseUrl}verify/resend-email`)
         .send({
@@ -150,6 +150,156 @@ describe('Testing user routes', () => {
           expect(res.status).to.equal(200);
           expect(res.body).to.haveOwnProperty('message')
             .to.equal('Your verification link has been resent');
+          done();
+        });
+    });
+  });
+
+  describe('Registering with no user inputs', () => {
+    it('Should return a 400(Bad request) error', (done) => {
+      chai.request(server)
+        .post('/api/users')
+        .send({
+          user: {
+            email: '',
+            username: '',
+            password: '',
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('status').equal('fail');
+          expect(res.body.error.username[0]).to.equal('Please enter a username in the specified field');
+          expect(res.body.error.username.length).to.equal(1);
+          expect(res.body.error.email[0]).to.equal( 'Please enter an email in the specified field');
+          expect(res.body.error.email.length).to.equal(1);
+          expect(res.body.error.password[0]).to.equal('Please enter a password in the specified field');
+          expect(res.body.error.password.length).to.equal(1);
+          done();
+        });
+    });
+  });
+
+  describe('Registering with an invalid email', () => {
+    it('Should return a 400(Bad request) error', (done) => {
+      chai.request(server)
+        .post('/api/users')
+        .send({
+          user: {
+            email: 'jennymail.com',
+            username: 'jenny',
+            password: '1qQw@123',
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('status').equal('fail');
+          expect(res.body.error.email[0]).to.equal('Please enter a valid email');
+          expect(res.body.error.email.length).to.equal(1);
+          done();
+        });
+    });
+  });
+
+  describe('Registering with an invalid password with characters less than 8', () => {
+    it('Should return a 400(Bad request) error', (done) => {
+      chai.request(server)
+        .post('/api/users')
+        .send({
+          user: {
+            email: 'jenny@mail.com',
+            username: 'jenny',
+            password: '1234@',
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body.error.password[0]).to.equal(
+            'Your password must include an uppercase and lowercase alphabet, a number and a special character');
+          expect(res.body.error.password[1]).to.equal('Password entered should have minimum of 8 characters');
+          expect(res.body.error.password.length).to.equal(2);
+          done();
+        });
+    });
+  });
+
+  describe('Registering with an invalid password with characters more than 20', () => {
+    it('Should return a 400(Bad request) error', (done) => {
+      chai.request(server)
+        .post('/api/users')
+        .send({
+          user: {
+            email: 'jenny@mail.com',
+            username: 'jenny',
+            password: '12344444444443343444444434643543@',
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body.error.password[0]).to.equal(
+            'Your password must include an uppercase and lowercase alphabet, a number and a special character');
+          expect(res.body.error.password[1]).to.equal('Password entered should have maximum of 20 characters');
+          expect(res.body.error.password.length).to.equal(2);
+          done();
+        });
+    });
+  });
+
+  describe('Registering with an already existing email', () => {
+    it('Should return a 400(Bad request) error', (done) => {
+      chai.request(server)
+        .post('/api/users')
+        .send({
+          user: {
+            email: 'johnDoe@mail.com',
+            username: 'jenny',
+            password: '1qQw@123',
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('status').equal('fail');
+          expect(res.body.error).to.equal('Email entered already exists');
+          done();
+        });
+    });
+  });
+
+  describe('Registering with an already existing username', () => {
+    it('Should return a 400(Bad request) error', (done) => {
+      chai.request(server)
+        .post('/api/users')
+        .send({
+          user: {
+            email: 'johnny@mail.com',
+            username: 'John Doe',
+            password: '1qQw@123',
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('status').equal('fail');
+          expect(res.body.error).to.equal('Username entered already exists');
+          done();
+        });
+    });
+  });
+
+  describe('Registering with an already existing username and email', () => {
+    it('Should return a 400(Bad request) error', (done) => {
+      chai.request(server)
+        .post('/api/users')
+        .send({
+          user: {
+            email: 'johnDoe@mail.com',
+            username: 'John Doe',
+            password: '11qQw@123',
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('status').equal('fail');
+          expect(res.body.error).to.equal('Email and Username entered already exists');
           done();
         });
     });

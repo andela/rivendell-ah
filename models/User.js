@@ -45,9 +45,10 @@ export default (sequelize, DataTypes) => {
     },
   }, {
     hooks: {
+      /* eslint-disable no-param-reassign */
       beforeCreate: (user) => {
         user.salt = crypto.randomBytes(16).toString('hex');
-        user.hash = crypto // eslint-disable-next-line no-param-reassign
+        user.hash = crypto
           .pbkdf2Sync(user.hash, user.salt, 10000, 512, 'sha512')
           .toString('hex');
       },
