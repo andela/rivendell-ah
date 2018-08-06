@@ -1,0 +1,36 @@
+{
+  "name": "rivendell-ah",
+  "description": "",
+  "scripts": {
+    "postdeploy": "npm run migrate"
+  },
+  "env": {
+    "DATABASE_URL": {
+      "required": true
+    },
+    "HEROKU_APP_NAME": {
+      "required": true
+    },
+    "AUTH_SECRET": {
+      "required": true
+    },
+    "BASEURL": {
+      "required": true
+    },
+    "SESSION_SECRET": {
+      "required": true
+    },
+    "GMAIL_USER": {
+      "required": true
+    },
+    "GMAIL_PASSWORD": {
+      "required": true
+    }
+  },
+  "formation": {
+  },
+  "addons": [
+  ],
+  "buildpacks": [
+  ]
+}

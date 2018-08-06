@@ -3,10 +3,22 @@
   "version": "1.0.0",
   "description": "A Social platform for the creative at heart",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "engines": {
+    "node": "8.11.3",
+    "npm": "5.6.0"
   },
-  "author": "Andela Simulations Programme",
+  "scripts": {
+    "start": "babel-node index.js --exec babel-node",
+    "dev": "NODE_ENV=development nodemon ./index.js --exec babel-node",
+    "lint": "eslint .",
+    "pretest": "npm run posttest && sequelize --env test db:migrate && sequelize --env test db:seed:all",
+    "test": "cross-env NODE_ENV=test nyc mocha --compilers js:babel-core/register ./test/**/*.js",
+    "posttest": "sequelize --env test db:migrate:undo:all",
+    "coverage": "npm run pretest && cross-env NODE_ENV=test babel-node ./node_modules/babel-istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha && npm run posttest",
+    "migrate": "sequelize db:migrate",
+    "undo:migrate": "sequelize db:migrate:undo:all"
+  },
+  "author": "Andela Simulations Programme ",
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.3",
@@ -17,16 +29,46 @@
     "express": "^4.16.3",
     "express-jwt": "^5.3.1",
     "express-session": "^1.15.6",
+    "faker": "^4.1.0",
     "jsonwebtoken": "^8.3.0",
     "method-override": "^2.3.10",
     "methods": "^1.1.2",
-    "mongoose": "^5.2.2",
-    "mongoose-unique-validator": "^2.0.1",
     "morgan": "^1.9.0",
+    "nodemailer": "^4.6.7",
+    "nodemon": "^1.18.3",
     "passport": "^0.4.0",
+    "passport-google-oauth": "^1.0.0",
     "passport-local": "^1.0.0",
+    "pg": "^7.4.3",
+    "pg-hstore": "^2.3.2",
     "request": "^2.87.0",
+    "save-dev": "^2.0.0",
+    "sequelize": "^4.38.0",
+    "sequelize-cli": "^4.0.0",
     "slug": "^0.9.1",
-    "underscore": "^1.9.1"
+    "underscore": "^1.9.1",
+    "validatorjs": "^3.14.2"
+  },
+  "devDependencies": {
+    "nyc": "^12.0.2",
+    "babel-cli": "^6.26.0",
+    "babel-istanbul": "^0.12.2",
+    "babel-preset-env": "^1.7.0",
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
+    "coveralls": "^3.0.2",
+    "cross-env": "^5.2.0",
+    "eslint-config-airbnb": "^17.0.0",
+    "eslint-plugin-jsx-a11y": "^6.1.1",
+    "eslint-plugin-react": "^7.10.0",
+    "eslint": "^5.2.0",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "faker": "^4.1.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.2.0",
+    "nodemon": "^1.18.3",
+    "underscore": "^1.9.1",
+    "validatorjs": "^3.14.2"
   }
 }

@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/andela/rivendell-ah.svg?branch=staging)](https://travis-ci.org/andela/rivendell-ah) [![Coverage Status](https://coveralls.io/repos/github/andela/rivendell-ah/badge.svg?branch=staging)](https://coveralls.io/github/andela/rivendell-ah?branch=staging) [![Maintainability](https://api.codeclimate.com/v1/badges/ced71eb8f613cf2502fc/maintainability)](https://codeclimate.com/github/andela/rivendell-ah/maintainability)
+
 Authors Haven - A Social platform for the creative at heart.
 =======
 
