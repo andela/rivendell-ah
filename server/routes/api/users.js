@@ -1,8 +1,9 @@
 
 import { Router } from 'express';
-import UserController from '../../controllers/User';
-import validate from '../../utils/middleware/validator/users';
 import oauthRoute from './auth/authRoute';
+import UserController from '../../controllers/UserController';
+import UsersValidator from '../../utils/middleware/validator/UsersValidator';
+import AuthMiddleware from '../../utils/middleware/AuthMiddleware';
 
 const router = Router();
 
@@ -12,11 +13,14 @@ router.get(
 );
 
 router.put(
-  '/user', UserController.update,
+  '/user',
+  AuthMiddleware.authenticateUser,
+  UsersValidator.updateUser,
+  UserController.update,
 );
 
 router.post(
-  '/users', validate.signup, UserController.signup,
+  '/users', UsersValidator.signup, UserController.signup,
 );
 
 router.post(
@@ -32,7 +36,7 @@ router.get(
 );
 
 router.post(
-  '/users/forgot-password', validate.forgotPassword,
+  '/users/forgot-password', UsersValidator.forgotPassword,
   UserController.forgotPassword,
 );
 
@@ -41,8 +45,13 @@ router.get(
 );
 
 router.put(
-  '/users/reset-password', validate.resetPassowrd,
+  '/users/reset-password',
+  UsersValidator.resetPassword,
   UserController.resetPasswordUpdate,
 );
+
+router.get('/profiles/:username', UserController.getProfile);
+
+router.get('/profiles', UserController.getAllProfile);
 
 export default router;
