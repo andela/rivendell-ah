@@ -38,6 +38,7 @@ class UserController {
         { sendMail: verificationHelper.sendVerificationEmail(user), user }))
       .then(({ user }) => {
         const payload = {
+          id: user.id,
           username: user.username,
           email: user.email,
         };
@@ -92,6 +93,7 @@ class UserController {
 
         if (user) {
           const payload = {
+            id: user.id,
             username: user.username,
             email: user.email,
           };

@@ -27,6 +27,18 @@ const validationErrors = {
     min: 'last name entered should have minimum of 2 characters',
     max: 'last name entered should have maximum of 50 characters',
   },
+  title: {
+    required: 'Please specify a title for your Article',
+    string: 'Title must be a String',
+  },
+  description: {
+    required: 'Please specify a description for your Article',
+    string: 'Description must be a String',
+  },
+  body: {
+    required: 'Please specify a body for your Article',
+    string: 'Body must be a String',
+  },
 };
 
 const signupRules = (userInput) => {
@@ -129,9 +141,51 @@ const updateUserRules = (userInput) => {
   return false;
 };
 
+const createArticleRules = (userInput) => {
+  // Validator rules
+  const rules = {
+    title: 'required|string',
+    description: 'required|string',
+    body: 'required|string',
+  };
+  // Setting up customized descriptive messages
+  const validation = new Validator(userInput, rules, {
+    'required.title': validationErrors.title.required,
+    'string.title': validationErrors.title.string,
+    'required.description': validationErrors.description.required,
+    'string.description': validationErrors.description.string,
+    'required.body': validationErrors.body.required,
+    'string.body': validationErrors.body.string,
+  });
+  if (validation.fails()) {
+    return validation.errors.all();
+  }
+  return false;
+};
+const updateArticleRules = (userInput) => {
+  // Validator rules
+  const rules = {
+    title: 'string',
+    description: 'string',
+    body: 'string',
+  };
+  // Setting up customized descriptive messages
+  const validation = new Validator(userInput, rules, {
+    'string.title': validationErrors.title.string,
+    'string.description': validationErrors.description.string,
+    'string.body': validationErrors.body.string,
+  });
+  if (validation.fails()) {
+    return validation.errors.all();
+  }
+  return false;
+};
+
 export default {
   signupRules,
   forgotPasswordRules,
   resetPasswordRules,
   updateUserRules,
+  createArticleRules,
+  updateArticleRules,
 };

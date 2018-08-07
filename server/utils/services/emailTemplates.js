@@ -122,7 +122,7 @@ module.exports = {
             to reset your password.<br/><strong>NB: 
             </strong>This Verification Token is only valid for 30 minutes.</p>
           <a href="${url}" id="link">Reset My Password</a>
-          <p>If you did not forgot your password for Author's Haven you 
+          <p>If you did not forget your password for Author's Haven you 
           can safely ignore this email</p>
         </div>
         <div class="footer">Author Haven Copyright 2018</div>

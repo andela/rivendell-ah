@@ -2,6 +2,7 @@
 /* eslint no-param-reassign: off */
 import crypto from 'crypto';
 
+
 export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     firstName: {
@@ -16,14 +17,6 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
-    },
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    lastName: {
-      type: DataTypes.STRING,
-      allowNull: true,
     },
     email: {
       type: DataTypes.STRING,
@@ -66,7 +59,12 @@ export default (sequelize, DataTypes) => {
       },
     },
   });
-  User.associate = () => {};
 
+  User.associate = (models) => {
+    User.hasMany(models.Article, {
+      foreignKey: 'authorId',
+      as: 'userArticles',
+    });
+  };
   return User;
 };
