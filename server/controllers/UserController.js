@@ -146,40 +146,32 @@ class UserController {
    * @param {function} next a call to the next function
    * @returns {Object} the response body
    */
-  static update(req, res, next) {
-    const { decoded } = req.body;
+  static update(req, res) {
+    const foundUser = req.user;
     const {
       firstName, lastName, username, password, bio, image,
     } = req.body.user;
-    User.findOne({ where: { email: decoded.email } })
-      .then((foundUser) => {
-        if (!foundUser) {
-          return res.status(404)
-            .json({ errors: { message: 'User not found' } });
-        }
-        const user = foundUser;
-        // only update fields that were actually passed...
-        user.username = username ? username.trim() : foundUser.username;
-        user.firstName = firstName ? firstName.trim() : foundUser.firstName;
-        user.lastName = lastName ? lastName.trim() : foundUser.lastName;
-        user.bio = bio ? bio.trim() : foundUser.bio;
-        user.image = image ? image.trim() : foundUser.image;
-        user.hash = password
-          ? hashPassword(password, user.salt) : foundUser.hash;
-        return user.save()
-          .then(() => res.status(200).json({
-            user: {
-              firstName: user.firstName,
-              lastName: user.lastName,
-              email: user.email,
-              username: user.username,
-              image: user.image,
-              bio: user.bio,
-              verified: user.verified,
-            },
-          }));
-      })
-      .catch(next);
+    const user = foundUser;
+    // only update fields that were actually passed...
+    user.username = username ? username.trim() : foundUser.username;
+    user.firstName = firstName ? firstName.trim() : foundUser.firstName;
+    user.lastName = lastName ? lastName.trim() : foundUser.lastName;
+    user.bio = bio ? bio.trim() : foundUser.bio;
+    user.image = image ? image.trim() : foundUser.image;
+    user.hash = password
+      ? hashPassword(password, user.salt) : foundUser.hash;
+    return user.save()
+      .then(() => res.status(200).json({
+        user: {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          username: user.username,
+          image: user.image,
+          bio: user.bio,
+          verified: user.verified,
+        },
+      }));
   }
 
   /**

@@ -8,13 +8,13 @@ use(chaiHttp);
 describe('Social Login', () => {
   describe('when user tries to login with facebook', () => {
     it(`should redirect the user to facebook website and return 200`, (done) => {
-      request(server)
-        .get('/api/auth/facebook')
-        .end((err, res) => {
-         expect(res)
-            .property('status').to.equal(200);
-          done();
-        });
+  request(server)
+    .get('/api/auth/facebook')
+    .end((err, res) => {
+     expect(res)
+        .property('status').to.equal(200);
+      done();
+    });
     }).timeout(50000);
   });
 

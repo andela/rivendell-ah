@@ -1,0 +1,210 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "This API provides a platform for users to",
+    "version" : "1.0.0",
+    "title" : "Authors Haven",
+    "contact" : {
+      "email" : "chidioguejiofor@gmail.com"
+    },
+    "license" : {
+      "name" : "MIT 2.0.0",
+      "url" : "https://authorhaven.herokuapp.com"
+    }
+  },
+  "host" : "virtserver.swaggerhub.com",
+  "basePath" : "/chidioguejiofor/RviendellAuthorsHaven/1.0.0",
+  "tags" : [ {
+    "name" : "authors",
+    "description" : "helps authors publish articles"
+  }, {
+    "name" : "readers",
+    "description" : "allows readers to view and read articles"
+  } ],
+  "schemes" : [ "https" ],
+  "paths" : {
+    "/auth/linkedin" : {
+      "get" : {
+        "tags" : [ "social login", "linkedin" ],
+        "summary" : "retrieves user information using Linkedin OAuth",
+        "produces" : [ "text/html" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "redirect to likedin successfully"
+          }
+        }
+      }
+    },
+    "/auth/google" : {
+      "get" : {
+        "tags" : [ "social login", "google" ],
+        "summary" : "retrieves user information using Google OAuth",
+        "produces" : [ "text/html" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "redirect to google successfully"
+          }
+        }
+      }
+    },
+    "/auth/facebook" : {
+      "get" : {
+        "tags" : [ "social login", "facebook" ],
+        "summary" : "retrieves user information using Facebook OAuth",
+        "produces" : [ "text/html" ],
+        "parameters" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "redirect to facebook successfully"
+          }
+        }
+      }
+    },
+    "/users" : {
+      "post" : {
+        "tags" : [ "developers" ],
+        "summary" : "signs up a new user",
+        "description" : "This signup a  new user and persists the user into the database",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "user",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/user"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "user was created successfully"
+          },
+          "400" : {
+            "description" : "invalid data."
+          }
+        }
+      }
+    },
+    "/users/login" : {
+      "post" : {
+        "tags" : [ "developers" ],
+        "summary" : "signs up a new user",
+        "description" : "This logs in an existing user and returns a token",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "user",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/user_1"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "user was created successfully"
+          },
+          "400" : {
+            "description" : "invalid data."
+          }
+        }
+      }
+    },
+    "/users/forgot-password" : {
+      "post" : {
+        "tags" : [ "Authentication" ],
+        "summary" : "sends an email containing password reset instructions to the user",
+        "description" : "the helps a user reset his password once via mail",
+        "consumes" : [ "application/json" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "User",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/User"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "if the email was sent successfully"
+          },
+          "400" : {
+            "description" : "invalid request"
+          }
+        }
+      }
+    },
+    "/users/reset-password" : {
+      "put" : {
+        "tags" : [ "Authentication" ],
+        "summary" : "Sends a request to the server to reset user password by the user email",
+        "description" : "the request changes the user password by  asking him for his former password",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "User",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/User_1"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "the request was sent successfully"
+          },
+          "400" : {
+            "description" : "the email was not found or is invalid"
+          }
+        }
+      }
+    }
+  },
+  "definitions" : {
+    "User" : {
+      "properties" : {
+        "email" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "email" : "email"
+      }
+    },
+    "user_1" : {
+      "properties" : {
+        "username" : {
+          "type" : "string"
+        },
+        "password" : {
+          "type" : "string"
+        },
+        "email" : {
+          "type" : "string"
+        }
+      }
+    },
+    "user" : {
+      "properties" : {
+        "username" : {
+          "type" : "string"
+        },
+        "password" : {
+          "type" : "string"
+        },
+        "email" : {
+          "type" : "string"
+        }
+      }
+    },
+    "User_1" : {
+      "required" : [ "email" ],
+      "properties" : {
+        "email" : {
+          "type" : "string"
+        }
+      },
+      "example" : {
+        "email" : "email"
+      }
+    }
+  }
+}
