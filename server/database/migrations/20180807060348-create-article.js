@@ -9,23 +9,23 @@ module.exports = {
         defaults: Sequelize.UUIDV4,
       },
       slug: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       title: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       description: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       body: {
-        type: Sequelize.TEXT
+        type: Sequelize.TEXT,
       },
       image: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,

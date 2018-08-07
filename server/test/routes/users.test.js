@@ -17,12 +17,12 @@ chai.use(chaiHttp);
 let idTest; 
 
 let user6Token;
-
 describe('Testing user routes', () => {
   after((done) => {
     models.sequelize.close();
     done();
   });
+
   before((done) => {
     chai.request(server)
       .post(`${baseUrl}`)

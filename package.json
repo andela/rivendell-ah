@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "pretest": "npm run posttest && sequelize --env test db:migrate && sequelize --env test db:seed:all",
     "test": "cross-env NODE_ENV=test nyc mocha --timeout=8000 --compilers js:babel-core/register ./server/test/**/*.js",
-    "coverage": "npm run pretest && cross-env NODE_ENV=test babel-node ./node_modules/babel-istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --timeout=8000 ./server/test/**/*.js && npm run posttest ",
+    "coverage": "npm run pretest && cross-env NODE_ENV=test babel-node ./node_modules/babel-istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha --timeout=8000 ./server/test/**/*.js && npm run posttest",
     "posttest": "sequelize --env test db:migrate:undo:all",
     "migrate": "sequelize db:migrate",
     "undo:migrate": "sequelize db:migrate:undo:all",

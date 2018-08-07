@@ -1,4 +1,3 @@
-
 export default (sequelize, DataTypes) => {
   const Article = sequelize.define('Article', {
     id: {
@@ -50,6 +49,11 @@ export default (sequelize, DataTypes) => {
       as: 'comments',
       foreignKey: 'articleId',
       onDelete: 'CASCADE',
+    });
+    Article.hasMany(models.Rating, {
+      foreignKey: 'articleId',
+      onDelete: 'CASCADE',
+      as: 'ratings',
     });
   };
   return Article;
