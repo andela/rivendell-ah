@@ -23,6 +23,14 @@ module.exports = {
       verified: false,
       createdAt: new Date(),
       updatedAt: new Date()
+    },{
+      username: 'fattylee',
+      email: 'fattty@gmail.com',
+      hash: '12345',
+      salt: '12345',
+      verified: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }], {});
   },
 

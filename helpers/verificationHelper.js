@@ -18,7 +18,6 @@ export default {
       emailTemplates.verificationTemplate(url),
     );
     // do not send email on test environment
-    if (process.env.NODE_ENV === 'test') return null;
     return emailService.sendMail(mailOptions);
   },
   /**

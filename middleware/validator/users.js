@@ -1,5 +1,6 @@
 import models from '../../models';
 import validator from '../../helpers/validatorHelper';
+import tokenService from '../../services/tokenService';
 
 const { User } = models;
 /**
@@ -9,7 +10,7 @@ const { User } = models;
  * @param {function} next a call to the nect function
  * @returns {undefined}
  */
-export default function signup(req, res, next) {
+const signup = (req, res, next) => {
   // User Signup inputs
   const userInput = {
     username: req.body.user.username,
@@ -17,7 +18,7 @@ export default function signup(req, res, next) {
     password: req.body.user.password,
   };
   // Validation of user Inputs
-  const validation = validator(userInput);
+  const validation = validator.signupRules(userInput);
   if (validation) {
     return res.status(400).json({
       status: 'fail',
@@ -54,4 +55,71 @@ export default function signup(req, res, next) {
       return next();
     })
     .catch(next);
-}
+};
+
+/**
+* Function validates forgot password with error messages
+* @param {Object} req the request body
+* @param {Object} res the response body
+* @param {function} next a call to the nect function
+* @returns {undefined}
+*/
+const forgotPassword = (req, res, next) => {
+  const { email } = req.body.user;
+  // Validation of user Inputs
+  const validation = validator.forgotPasswordRules({ email });
+  if (validation) {
+    return res.status(400).json({
+      status: 'fail',
+      error: validation,
+    });
+  }
+  return next();
+};
+
+/**
+ * Function validates reset password with error messages
+ * @param {Object} req the request body
+ * @param {Object} res the response body
+ * @param {function} next a call to the nect function
+ * @returns {undefined}
+ */
+const resetPassowrd = (req, res, next) => {
+  const token = req.headers.authorization;
+  const { password, confirm } = req.body.user;
+  const validation = validator.resetPassowrdRules({ password });
+
+  if (token === undefined) {
+    return res.status(400)
+      .json({ errors: { message: 'Token can not be undefined' } });
+  }
+  if (token === '') {
+    return res.status(400)
+      .json({ errors: { message: 'Token can not be empty' } });
+  }
+  const resetToken = tokenService.verifyToken(token, process.env.JWT_SECRET);
+
+  if (!resetToken) {
+    return res.status(401)
+      .json({ errors: { message: 'Invalid token' } });
+  }
+  if (validation) {
+    return res.status(400).json({
+      status: 'fail',
+      error: validation,
+    });
+  }
+  if (password !== confirm) {
+    return res.status(409)
+      .json({ errors: { message: 'Password does not match' } });
+  }
+  req.resetToken = resetToken;
+  req.password = password;
+  return next();
+};
+
+export default {
+  signup,
+  forgotPassword,
+  resetPassowrd,
+};

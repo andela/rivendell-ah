@@ -2,6 +2,7 @@
 import chai from 'chai'
 import faker from 'faker'
 import chaiHttp from 'chai-http'
+import dotenv from 'dotenv';
 import server from '../index';
 import models from '../models';
 import tokenService from '../services/tokenService';
@@ -9,12 +10,11 @@ import { User } from '../models';
 import mockData from './mockData';
 
 const {user1, user2, user3} = mockData
-require('dotenv').config();
-
 const { expect } = chai;
-chai.use(chaiHttp);
-
 const baseUrl = '/api/users/';
+dotenv.config();
+chai.use(chaiHttp);
+let idTest; 
 
 describe('Testing user routes', () => {
   after((done) => {
@@ -100,7 +100,8 @@ describe('Testing user routes', () => {
             });
         });
     });
-  }); describe('Requesting for verification mail resend on route(/api/user/verify/resend-email)', () => {
+  });
+  describe('Requesting for verification mail resend on route(/api/user/verify/resend-email)', () => {
     it('Should not resend email if email was not provided', (done) => {
       chai.request(server)
         .post(`${baseUrl}verify/resend-email`)
@@ -300,6 +301,260 @@ describe('Testing user routes', () => {
           expect(res.status).to.equal(400);
           expect(res.body).to.have.property('status').equal('fail');
           expect(res.body.error).to.equal('Email and Username entered already exists');
+          done();
+        });
+    });
+  });
+
+  describe('TEST POST /users/api/forgot-password', () => {
+    it('Should return Check your email for password reset token on success', (done) => {
+      chai.request(server)
+        .post('/api/users/forgot-password')
+        .send({
+          user: {
+            email: mockData.user4.email
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.haveOwnProperty('message')
+            .to.equal('Check your email for password reset token');
+          done();
+        });
+    });
+    
+    it('Should return undefined for missing email field', (done) => {
+      chai.request(server)
+        .post('/api/users/forgot-password')
+        .send({
+          user: {
+            email: '',
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('status').equal('fail');
+          expect(res.body.error.email[0]).to.equal( 'Please enter an email in the specified field');
+          expect(res.body.error.email.length).to.equal(1);
+          done();
+        });
+    });
+    it('Should return undefined for missing email field', (done) => {
+      chai.request(server)
+        .post('/api/users/forgot-password')
+        .send({
+          user: {
+            email: 'jndnej',
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('status').equal('fail');
+          expect(res.body.error.email[0]).to.equal('Please enter a valid email');
+          done();
+        });
+    });
+    
+    it('Should return user not found for unsaved email', (done) => {
+      chai.request(server)
+        .post('/api/users/forgot-password')
+        .send({
+          user: {
+            email: mockData.user5.email
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(404);
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.haveOwnProperty('message')
+            .to.equal('User not found!');
+          done();
+        });
+    });
+  });
+
+  describe('TEST GET /api/users/reset-password', () => {
+
+    it('Should return success on a valid token', (done) => {
+      const token = tokenService.generateToken({ username: mockData.user4.username, email: mockData.user4.email }, 60 * 30);
+      chai.request(server)
+        .get('/api/users/reset-password?token=' + token)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.haveOwnProperty('message')
+            .to.equal('Verification Successful, You can now reset your password');
+          done();
+        });
+    });
+
+    it('Should return Invalid token', (done) => {
+      chai.request(server)
+        .get('/api/users/reset-password?token=jjiji')
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.haveOwnProperty('message')
+            .to.equal('Invalid token');
+          done();
+        });
+    });
+  });
+
+  describe('TEST PUT /api/users/reset-password', () => {
+    before((done) => {
+      chai.request(server)
+        .post('/api/users')
+        .send({
+          user: {
+            email: 'fakeemail@gmail.com',
+            username: 'fakeusername',
+            password: '123456'
+          }
+        })
+        .end((err, res) => {
+          done();
+        });
+    });
+
+    it('Should return undefined for a missing token field', (done) => {
+      const token = tokenService.generateToken({ username: mockData.user4.username, email: mockData.user4.email }, 60 * 30);
+      chai.request(server)
+        .put('/api/users/reset-password')
+        .send({
+          user: {
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.haveOwnProperty('message')
+            .to.equal('Token can not be undefined');
+          done();
+        });
+    });
+
+    it('Should return error for an empty token field', (done) => {
+      const token = tokenService.generateToken({ username: mockData.user4.username, email: mockData.user4.email }, 60 * 30);
+      chai.request(server)
+        .put('/api/users/reset-password')
+        .set('Authorization', '')
+        .send({
+          user: {
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.haveOwnProperty('message')
+            .to.equal('Token can not be empty');
+          done();
+        });
+    });
+    it('Should return error for an invalid token', (done) => {
+          const token = tokenService.generateToken({ username: mockData.user4.username, email: mockData.user4.email }, 60 * 30);
+          chai.request(server)
+            .put('/api/users/reset-password')
+            .set('Authorization', 'hjjbjbj')
+            .send({
+              user: {
+                password: '12345',
+                confirm: '12345',
+              }
+            })
+            .end((err, res) => {
+              expect(res.status).to.equal(401);
+              expect(res.body).to.haveOwnProperty('errors')
+                .to.haveOwnProperty('message')
+                .to.equal('Invalid token');
+              done();
+            });
+        });
+
+    it('Should return error for a missing and empty password field', (done) => {
+      const token = tokenService.generateToken({ username: mockData.user4.username, email: mockData.user4.email }, 60 * 30);
+      chai.request(server)
+        .put('/api/users/reset-password')
+        .set('Authorization', token)
+        .send({
+          user: {
+            password: '',
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.have.property('status').equal('fail');
+          expect(res.body.error.password[0]).to.equal('Please enter a password in the specified field');
+          expect(res.body.error.password.length).to.equal(1);
+          done();
+        });
+    });
+
+    it('Should return error for password mismatch', (done) => {
+    const token = tokenService.generateToken({
+      username: mockData.user4.username, email: mockData.user4.email 
+    },
+    60 * 30);
+    chai.request(server)
+      .put('/api/users/reset-password')
+      .set('Authorization', token)
+      .send({
+        user: {
+          password: '12345Qh@',
+          confirm: '12346',
+        }
+      })
+      .end((err, res) => {
+        expect(res.status).to.equal(409);
+        expect(res.body).to.haveOwnProperty('errors')
+          .to.haveOwnProperty('message')
+          .to.equal('Password does not match');
+        done();
+      });
+    });
+    it('Should return password updated on success', (done) => {
+    User.findOne({ where: { email: 'fattty@gmail.com' }})
+      .then((user) => {
+        idTest =user.id;
+        const token = tokenService.generateToken(
+          { 
+            id: user.id 
+          }, 60 * 20);
+        chai.request(server)
+          .put('/api/users/reset-password')
+          .set('Authorization', token)
+          .send({
+            user: {
+              password: '12345Qh@',
+              confirm: '12345Qh@',
+            }
+          })
+          .end((err, res) => {
+            expect(res.status).to.equal(200);
+            expect(res.body).to.haveOwnProperty('message')
+              .to.equal('Password updated!');
+            done();
+          });
+        })
+    });
+    it('Should return user not found for unsaved email', (done) => {
+      const token = tokenService.generateToken(
+        { 
+          id: -166,
+        }, 60 * 20);
+      chai.request(server)
+        .put('/api/users/reset-password')
+        .set('Authorization', token)
+        .send({
+          user: { 
+            password: 'cindsanf)0FSSC',
+            confirm: 'cindsanf)0FSSC'
+          }
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.haveOwnProperty('message')
+            .to.equal('User not found');
           done();
         });
     });
