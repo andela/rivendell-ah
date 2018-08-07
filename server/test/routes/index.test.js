@@ -3,10 +3,19 @@
 import chai, { expect, use, request } from 'chai';
 import chaiHttp from 'chai-http';
 import server from '../../index';
-
-use(chaiHttp);
+import oAuthTest from './oauth.test'
+import authTest from './auth.test'
+import usersTest from './users.test';
+import articlesTest from './article.test';
+import rateArticlesTest from './rateArticles.test';
+import models from '../../database/models';
+chai.use(chaiHttp);
 
 describe('Testing the index.js file', () => {
+  after((done) => {
+    models.sequelize.close();
+  done();
+  });
   describe('Navigating to a bad route', () => {
     it('Should return error 404 (not found)', (done) => {
       request(server)
@@ -17,4 +26,9 @@ describe('Testing the index.js file', () => {
         });
     });
   });
+  authTest();
+  oAuthTest()
+  usersTest();
+  articlesTest();
+  rateArticlesTest();
 });

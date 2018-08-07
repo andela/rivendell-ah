@@ -1,12 +1,12 @@
-/* eslint-disable */
-
 module.exports = {
+  /* eslint-disable  no-unused-vars */
   up: (queryInterface, Sequelize) => queryInterface.bulkInsert('Users', [{
     firstName: 'John',
     lastName: 'Doe',
     username: 'John Doe',
     email: 'johnDoe@mail.com',
     hash: '1qQw@123',
+    verified: false,
     createdAt: new Date(),
     updatedAt: new Date(),
   }], {}),

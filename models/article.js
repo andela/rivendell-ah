@@ -1,14 +1,11 @@
+
+
 export default (sequelize, DataTypes) => {
   const Article = sequelize.define('Article', {
-    id: {
-      allowNull: false,
-      primaryKey: true,
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-    },
     slug: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
       required: true,
     },
     title: {
@@ -36,12 +33,6 @@ export default (sequelize, DataTypes) => {
     Article.belongsTo(models.User, {
       foreignKey: 'authorId',
       onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
-      as: 'author',
-    });
-    Article.hasMany(models.Rating, {
-      foreignKey: 'articleId',
-      as: 'ratings',
     });
   };
   return Article;
