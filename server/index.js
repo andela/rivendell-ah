@@ -5,6 +5,7 @@ import cors from 'cors';
 import errorhandler from 'errorhandler';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
+import passport from 'passport';
 import routes from './routes';
 import {} from './database/models/user';
 import {} from 'dotenv/config';
@@ -17,6 +18,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const app = express();
 
 // Normal express config defaults
+app.use(passport.initialize());
 app.use(cors());
 app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
