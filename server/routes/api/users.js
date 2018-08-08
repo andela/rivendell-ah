@@ -2,11 +2,10 @@
 import { Router } from 'express';
 import UserController from '../../controllers/User';
 import validate from '../../utils/middleware/validator/users';
-import oauthRoute from './auth/authRoute';
 
 const router = Router();
 
-router.use('/auth', oauthRoute);
+
 router.get(
   '/user', UserController.get,
 );
