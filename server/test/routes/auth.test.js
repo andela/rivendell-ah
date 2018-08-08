@@ -1,12 +1,12 @@
 /* eslint-disable */
 
 import chai, { expect, use, request } from 'chai';
-
 import { describe, it, before } from 'mocha';
-import { internet, name } from 'faker';
+import faker, { internet, name, random } from 'faker';
 import chaiHttp from 'chai-http';
 import server from '../../index';
 
+import { sequelize } from '../../database/models';
 
 
 const SIGN_UP_ROUTE = '/api/users';

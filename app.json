@@ -25,30 +25,6 @@
     },
     "GMAIL_PASSWORD": {
       "required": true
-    }, 
-    "GOOGLE_CLIENT_ID":{
-      "required": true
-    },
-    "GOOGLE_CLIENT_SECRET":{
-      "required": true
-    },
-    "GOOGLE_CALLBACK_URL":{
-      "required": true
-    },
-    "FACEBOOK_ID":{
-      "required": true
-    },
-    "FACEBOOK_SECRET":{
-      "required": true
-    },
-    "FACEBOOK_CALLBACK_URL":{
-      "required": true
-    },
-    "LINKEDIN_ID":{
-      "required": true
-    },
-    "LINKEDIN_SECRET":{
-      "required": true
     }
   },
   "formation": {
