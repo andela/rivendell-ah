@@ -6,9 +6,9 @@ import errorhandler from 'errorhandler';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
 import routes from './routes';
-import {} from './models/User';
+import {} from './database/models/user';
 import {} from 'dotenv/config';
-import {} from './config/passport';
+import {} from './configs/passport';
 
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -23,7 +23,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(methodOverride());
 app.use(express.static(`${__dirname}/public`));
-
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -39,7 +38,7 @@ if (!isProduction) {
 app.use(routes);
 
 
-// / catch 404 and forward to error handler
+// catch 404 and forward to error handler
 app.use((req, res, next) => {
   const err = new Error('Not Found');
   err.status = 404;
@@ -67,7 +66,7 @@ if (!isProduction) {
 
 // production error handler
 // no stacktraces leaked to user
-// eslint-disable-next-line no-unused-vars
+
 app.use((err, req, res, next) => {
   res.status(err.status || 500);
   res.json({

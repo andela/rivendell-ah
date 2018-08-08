@@ -1,4 +1,3 @@
-
 import crypto from 'crypto';
 
 const hashPassword = (password, salt) => crypto

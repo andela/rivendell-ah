@@ -8,13 +8,13 @@
     "npm": "5.6.0"
   },
   "scripts": {
-    "start": "babel-node index.js --exec babel-node",
-    "dev": "NODE_ENV=development nodemon ./index.js --exec babel-node",
+    "start": "babel-node ./server/index.js --exec babel-node",
+    "dev": "NODE_ENV=development nodemon ./server/index.js --exec babel-node",
     "lint": "eslint .",
-    "test": "cross-env NODE_ENV=test nyc mocha --compilers js:babel-core/register ./test/**/*.js",
     "pretest": "npm run posttest && sequelize --env test db:migrate && sequelize --env test db:seed:all",
+    "test": "cross-env NODE_ENV=test nyc mocha --compilers js:babel-core/register ./server/test/**/*.js",
     "posttest": "sequelize --env test db:migrate:undo:all",
-    "coverage": "npm run pretest && cross-env NODE_ENV=test babel-node ./node_modules/babel-istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha && npm run posttest",
+    "coverage": "npm run pretest && cross-env NODE_ENV=test babel-node ./node_modules/babel-istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha ./server/test/**/*.js && npm run posttest",
     "migrate": "sequelize db:migrate",
     "undo:migrate": "sequelize db:migrate:undo:all"
   },
@@ -68,7 +68,6 @@
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.3",
-    "underscore": "^1.9.1",
-    "validatorjs": "^3.14.2"
+    "underscore": "^1.9.1"
   }
 }

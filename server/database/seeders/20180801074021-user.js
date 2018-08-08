@@ -1,4 +1,4 @@
-'use strict';
+/* eslint-disable */
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -8,14 +8,14 @@ module.exports = {
       hash: '12345',
       verified: false,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     }, {
       username: 'strawhat',
       email: 'strawhat@gmail.com',
       hash: '12345',
       verified: true,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     }, {
       username: 'naruto',
       email: 'naruto@gmail.com',
@@ -35,5 +35,5 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-  }
+  },
 };
