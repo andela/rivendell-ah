@@ -1,10 +1,12 @@
 import { Router } from 'express';
 import userRouter from './users';
 import articleRouter from './articles';
+import followRouter from './follow';
 
 const router = Router();
 router.use('/', userRouter);
-router.use('/articles', articleRouter);
+router.use('/', articleRouter);
+router.use('/', followRouter);
 router.use((err, req, res, next) => {
   if (err.name === 'ValidationError') {
     return res.status(422).json({

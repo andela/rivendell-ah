@@ -9,49 +9,49 @@ import LikeController from '../../controllers/LikeController';
 const router = Router();
 
 router.post(
-  '/',
+  '/articles',
   auth.authenticateUser, auth.verifyUser,
   validate.createArticle,
   ArticleController.createArticle,
 );
 
 router.get(
-  '/:slug',
+  '/articles/:slug',
   ArticleController.getArticle,
 );
 router.get(
-  '/',
+  '/articles',
   ArticleController.getAllArticle,
 );
 
 router.put(
-  '/:slug',
+  '/articles/:slug',
   auth.authenticateUser, auth.verifyUser,
   validate.updateArticle,
   ArticleController.updateArticle,
 );
 
 router.delete(
-  '/:slug',
+  '/articles/:slug',
   auth.authenticateUser, auth.verifyUser,
   ArticleController.deleteArticle,
 );
 
 router.post(
-  '/:slug/like',
+  '/articles/:slug/like',
   auth.authenticateUser,
   auth.verifyUser,
   LikeController.likeArticle,
 );
 
 router.delete(
-  '/:slug/like',
+  '/articles/:slug/like',
   auth.authenticateUser,
   auth.verifyUser,
   LikeController.unlikeArticle,
 );
 router.get(
-  '/:slug/like',
+  '/articles/:slug/like',
   auth.authenticateUser,
   auth.verifyUser,
   LikeController.getArticleLikes,
