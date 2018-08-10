@@ -16,6 +16,8 @@ use(chaiHttp);
 
 const tempUser = {
   user: {
+    firstName: 'Naruto',
+    lastName: 'Uzumaki',
     username: 'usename10101111',
     email: 'thisafakeemail@email.com',
     password: '11qQw@123',
@@ -89,6 +91,8 @@ describe('user test', () => {
             .post(SIGN_UP_ROUTE)
             .send({
               user: {
+                firstName: 'Naruto',
+                lastName: 'Uzumaki',
                 email: 'testmail@mail.com',
                 username: `validUser1010${Date.now()}`,
                 password: '1qQw@123',

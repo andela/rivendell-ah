@@ -3,7 +3,7 @@ import models from '../database/models';
 import tokenService from '../utils/services/tokenService';
 import verificationHelper from '../utils/helpers/verificationHelper';
 import emailService from '../utils/services/emailService';
-import hashPassowrd from '../utils/services/passwordHashService';
+import hashPassword from '../utils/services/passwordHashService';
 import emailTemplates from '../utils/services/emailTemplates';
 
 const { User } = models;
@@ -28,9 +28,11 @@ class UserController {
    */
   static signup(req, res, next) {
     const {
-      username, email, password: hash,
+      firstName, lastName, username, email, password: hash,
     } = req.body.user;
-    User.create({ username, email, hash })
+    User.create({
+      firstName, lastName, username, email, hash,
+    })
       // return the user and a promise call to send the verification email
       .then(user => (
         { sendMail: verificationHelper.sendVerificationEmail(user), user }))
@@ -41,14 +43,19 @@ class UserController {
         };
         const token = tokenService.generateToken(payload, '3d');
 
-        return res.status(201).json({
+        res.status(201).json({
           user: {
+            firstName: user.firstName,
+            lastName: user.lastName,
             email: user.email,
             username: user.username,
+            image: user.image,
+            bio: user.bio,
+            verified: user.verified,
             token,
           },
-          message: 'Sign up successful, visit your email'
-          + ' to verify your account.',
+          message: `Sign up successful, visit your email 
+          to verify your account.`,
         });
       })
       .catch(next);
@@ -66,18 +73,15 @@ class UserController {
    */
   static login(req, res, next) {
     if (!req.body.user) {
-      return res.status(422)
-        .json({ errors: { user: 'must be an object' } });
+      return res.status(422).json({ errors: { user: 'must be an object' } });
     }
 
     if (!req.body.user.email) {
-      return res.status(422)
-        .json({ errors: { email: 'can\'t be blank' } });
+      return res.status(422).json({ errors: { email: 'can\'t be blank' } });
     }
 
     if (!req.body.user.password) {
-      return res.status(422)
-        .json({ errors: { password: 'can\'t be blank' } });
+      return res.status(422).json({ errors: { password: 'can\'t be blank' } });
     }
     return passport.authenticate(
       'local', { session: false },
@@ -95,8 +99,13 @@ class UserController {
           const token = tokenService.generateToken(payload, '3d');
           return res.status(200).json({
             user: {
+              firstName: user.firstName,
+              lastName: user.lastName,
               email: user.email,
               username: user.username,
+              image: user.image,
+              bio: user.bio,
+              verified: user.verified,
               token,
             },
           });
@@ -136,34 +145,37 @@ class UserController {
    * @returns {Object} the response body
    */
   static update(req, res, next) {
-    User.findById(req.payload.id)
+    const { decoded } = req.body;
+    const {
+      firstName, lastName, username, password, bio, image,
+    } = req.body.user;
+    User.findOne({ where: { email: decoded.email } })
       .then((foundUser) => {
         if (!foundUser) {
-          return res.sendStatus(401);
+          return res.status(404)
+            .json({ errors: { message: 'User not found' } });
         }
         const user = foundUser;
-        const {
-          username, email, bio, image, password,
-        } = req.body.user;
-
-        // only update fields that were actually passed..
-        if (!username) {
-          user.username = username;
-        }
-        if (!email) {
-          user.email = email;
-        }
-        if (!bio) {
-          user.bio = bio;
-        }
-        if (!image) {
-          user.image = image;
-        }
-        if (!password) {
-          user.setPassword(req.body.user.password);
-        }
-
-        return user.save().then(() => res.json({ user: user.toAuthJSON() }));
+        // only update fields that were actually passed...
+        user.username = username ? username.trim() : foundUser.username;
+        user.firstName = firstName ? firstName.trim() : foundUser.firstName;
+        user.lastName = lastName ? lastName.trim() : foundUser.lastName;
+        user.bio = bio ? bio.trim() : foundUser.bio;
+        user.image = image ? image.trim() : foundUser.image;
+        user.hash = password
+          ? hashPassword(password, user.salt) : foundUser.hash;
+        return user.save()
+          .then(() => res.status(200).json({
+            user: {
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email,
+              username: user.username,
+              image: user.image,
+              bio: user.bio,
+              verified: user.verified,
+            },
+          }));
       })
       .catch(next);
   }
@@ -306,17 +318,85 @@ class UserController {
     return User.findOne({ where: { id: resetToken.id } })
       .then((user) => {
         if (user) {
-          user.update({ hash: hashPassowrd(password, user.salt) })
+          return user.update({ hash: hashPassword(password, user.salt) })
             .then(result => res.status(200)
               .json({
                 username: result.username, message: 'Password updated!',
               }));
-        } else {
-          return res.status(400)
+        }
+        return res.status(400)
+          .json({ errors: { message: 'User not found' } });
+      })
+      .catch(next);
+  }
+
+  /**
+   * Get a profile
+   * @param {Object} req the request body
+   * @param {Object} res the response body
+   * @param {function} next a call to the next function
+   * @returns {Object} the response body
+   */
+  static getProfile(req, res, next) {
+    const { username } = req.params;
+    let owner = false;
+    const token = req.headers.authorization;
+    // get the username from the header token if present
+    const decoded = tokenService.verifyToken(token);
+    // check to see if the profile belongs to the logged in user
+    if (decoded.username === username) owner = true;
+    User.findOne({ where: { username } })
+      .then((user) => {
+        if (!user) {
+          return res.status(404)
             .json({ errors: { message: 'User not found' } });
         }
-        return null;
+        const profile = {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          image: user.image,
+          bio: user.bio,
+          owner,
+        };
+        // only return verification status for ...
+        // logged in users checking their profile
+        if (owner) {
+          profile.verified = user.verified;
+        }
+        return res.status(200).json({ profile });
       })
+      .catch(next);
+  }
+
+
+  /**
+   * get all users, with the ability to search for users/profiles
+   * @param {Object} req the request body
+   * @param {Object} res the response body
+   * @param {function} next a call to the next function
+   * @returns {Object} the response body
+   */
+  static getAllProfile(req, res, next) {
+    // get query params
+    const { search } = req.query;
+    // set the default limit
+    const limit = req.query.limit <= 20 ? req.query.limit : 20;
+    // set the default offset
+    const offset = req.query.offset >= 0 ? req.query.offset : 0;
+    const dbQuery = {
+      limit,
+      offset,
+      attributes: [
+        'firstName', 'lastName', 'email',
+        'image', 'bio', 'username',
+      ],
+    };
+    if (search) {
+      dbQuery.where = { username: { $like: `%${search}%` } };
+    }
+    User.findAll(dbQuery)
+      .then(result => res.status(200).json(result))
       .catch(next);
   }
 }

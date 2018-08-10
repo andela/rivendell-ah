@@ -59,4 +59,5 @@ passport.use(new LinkedinStrategy({
   clientSecret: process.env.LINKEDIN_SECRET,
   callbackURL: '/api/auth/linkedin/redirect',
   scope: ['r_emailaddress', 'r_basicprofile'],
+  state: true,
 }, OauthController.passportCallback));
