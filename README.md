@@ -9,6 +9,29 @@ by leveraging the modern web.
 
 ---
 
+## Technologies
+
+The application uses `Nodejs` and `Express` as the server side frameworks and `PostgreSQL` for persisting data with `Sequelize` as the Object-relational mapper.
+
+## Installation
+
+Follow the steps below to setup a local development environment, make sure to have `Nodejs` and `PostgreSQL` installed.
+
+1.  Clone the repository from a terminal `git clone https://github.com/andela/rivendell-ah.git`.
+2.  Navigate to the project directory `cd rivendell-ah`
+3.  Run `npm install` on the terminal to install dependencies.
+4.  Change `.env-sample` to `.env` and provide the necessary credentials
+5.  Run `npm start` to start the application.
+
+## Testing
+
+Follow the steps below to test the application.
+
+1.  Navigate to the project directory through a terminal
+2.  If you haven't, install dependencies `npm install`
+3.  Also, Change `.env-sample` to `.env` and provide the necessary credentials if applicable
+4.  Run `npm test`
+
 ## API Spec
 The preferred JSON object to be returned by the API should be structured as follows:
 
@@ -17,10 +40,13 @@ The preferred JSON object to be returned by the API should be structured as foll
 ```source-json
 {
   "user": {
+    "firstName: "Jake",
+    "LastName: "Moore",
     "email": "jake@jake.jake",
     "token": "jwt.token.here",
     "username": "jake",
     "bio": "I work at statefarm",
+    "verified": false
     "image": null
   }
 }
@@ -29,6 +55,8 @@ The preferred JSON object to be returned by the API should be structured as foll
 ```source-json
 {
   "profile": {
+    "firstName: "Jake",
+    "LastName: "Moore",
     "username": "jake",
     "bio": "I work at statefarm",
     "image": "image-link",
@@ -193,16 +221,18 @@ Example request body:
 ```source-json
 {
   "user":{
+    "firstName: "Jake",
+    "LastName: "Moore",
     "username": "Jacob",
     "email": "jake@jake.jake",
-    "password": "jakejake"
+    "password": "J@kejake1"
   }
 }
 ```
 
 No authentication required, returns a User
 
-Required fields: `email`, `username`, `password`
+Required fields: `firstName`, `lastName`, `email`, `username`, `password`
 
 ### Get Current User
 
@@ -219,7 +249,9 @@ Example request body:
 ```source-json
 {
   "user":{
-    "email": "jake@jake.jake",
+    "firstName: "Jake",
+    "LastName: "Moore",
+    "username": "Jacob",
     "bio": "I like to skateboard",
     "image": "https://i.stack.imgur.com/xHWG8.jpg"
   }
@@ -228,13 +260,31 @@ Example request body:
 
 Authentication required, returns the User
 
-Accepted fields: `email`, `username`, `password`, `image`, `bio`
+Accepted fields: `firstName`, `lastName`, `username`, `password`, `image`, `bio`
 
 ### Get Profile
 
 `GET /api/profiles/:username`
 
 Authentication optional, returns a Profile
+
+### Get All Profiles
+
+`GET /api/profiles`
+
+Filter by search params
+
+`?search=jake`
+
+Limit number of profiles (default is 20):
+
+`?limit=20`
+
+Offset/skip number of profiles (default is 0):
+
+`?offset=0`
+
+No authentication required, returns an array of profiles
 
 ### Follow user
 
