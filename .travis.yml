@@ -8,7 +8,7 @@ before_script:
  - psql -c 'create database AuthorsHavenTest;' -U postgres
 
 script:
-  - npm test
+  - npm test --maxWorkers=4
   - npm run coverage
 
 after_script: 

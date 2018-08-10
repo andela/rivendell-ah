@@ -1,8 +1,8 @@
 /node_modules/**
 /coverage/**
-**/migrations/**
-**/seeders/**
-**/test/**
+server/migrations/**
+server/seeders/**
+server/test/**
 .env
 package-lock.json
 
