@@ -58,35 +58,30 @@ const mockData = {
     email: 'userwithName@gmail.com',
   },
   author3: {
-    id: 3,
     firstName: 'Strawhat',
     lastName: 'Luffy',
     username: 'strawhat',
     email: 'strawhat@gmail.com',
   },
   follow5: {
-    id: 5,
     firstName: 'Fatty',
     lastName: 'Lee',
     username: 'fattylee',
     email: 'fattty@gmail.com',
   },
   unverified: {
-    id: 6,
     firstName: 'Gadath',
     lastName: 'Pillow',
     username: 'pillowgad',
     email: 'pillowgad@gmail.com',
   },
   follow7: {
-    id: 7,
     firstName: 'Krista',
     lastName: 'Kolo',
     username: 'kolokris',
     email: 'kolokris@gmail.com',
   },
   follow8: {
-    id: 8,
     firstName: 'Zebedee',
     lastName: 'Macus',
     username: 'zebedee',
@@ -105,6 +100,32 @@ const mockData = {
     username: 'zebedee',
     bio: null,
     image: null
+  },
+  megameUser1: {
+    firstName: 'Charlie',
+    lastName: 'Brown',
+    username: 'charlieBrown',
+    email: 'charlieBrown@gmail.com',
+  },
+  megameUser2: {
+    firstName: 'Mary',
+    lastName: 'Jane',
+    username: 'maryJane',
+    email: 'maryJane@gmail.com',
+  },
+  megameUser3: {
+    firstName: 'Charlie1',
+    lastName: 'Brown1',
+    username: 'charlieBrown1',
+    email: 'charlieBrown1@gmail.com',
+  },
+  megameArticle1: {
+    title: 'article 1',
+    description: 'article 1',
+    body: 'article 1',
+    slug: 'article-1-1',
+    image: null,
+    authorId: 1,
   }
 };
 

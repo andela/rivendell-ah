@@ -39,6 +39,10 @@ const validationErrors = {
     required: 'Please specify a body for your Article',
     string: 'Body must be a String',
   },
+  commentBody: {
+    required: 'Comment body is required',
+    string: 'Comment body must be a string',
+  },
 };
 
 const signupRules = (userInput) => {
@@ -181,6 +185,37 @@ const updateArticleRules = (userInput) => {
   return false;
 };
 
+const createCommentRules = (commentInput) => {
+  // Validator rules
+  const rules = {
+    commentBody: 'required|string',
+  };
+  // Setting up customized descriptive messages
+  const validation = new Validator(commentInput, rules, {
+    'required.commentBody': validationErrors.commentBody.required,
+    'string.commentBody': validationErrors.commentBody.string,
+  });
+  if (validation.fails()) {
+    return validation.errors.all();
+  }
+  return false;
+};
+
+const updateCommentRules = (commentInput) => {
+  // Validator rules
+  const rules = {
+    commentBody: 'string',
+  };
+  // Setting up customized descriptive messages
+  const validation = new Validator(commentInput, rules, {
+    'string.commentBody': validationErrors.commentBody.string,
+  });
+  if (validation.fails()) {
+    return validation.errors.all();
+  }
+  return false;
+};
+
 export default {
   signupRules,
   forgotPasswordRules,
@@ -188,4 +223,6 @@ export default {
   updateUserRules,
   createArticleRules,
   updateArticleRules,
+  createCommentRules,
+  updateCommentRules,
 };

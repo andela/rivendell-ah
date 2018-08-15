@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { describe, it } from 'mocha';
 import { expect, use, request } from 'chai';
 import chaiHttp from 'chai-http';

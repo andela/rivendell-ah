@@ -82,6 +82,10 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'followingId',
       onDelete: 'cascade',
     });
+    User.hasMany(models.Comment, {
+      foreignKey: 'authorId',
+      as: 'userComments',
+    });
   };
   return User;
 };

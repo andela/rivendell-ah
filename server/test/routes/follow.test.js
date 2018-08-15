@@ -14,6 +14,8 @@ chai.use(chaiHttp);
 let { author3, follow5, follow7, follow8, unverified, followerProfile, followingProfile } = mockData;
 
 let follow7Token, follow8Token, follow5Token, author3Token, unverifedToken;
+let author3Id;
+let follow8Id;
 
 before((done) => {
   User.find({ where: { email: follow7.email }})
@@ -26,6 +28,7 @@ before((done) => {
 before((done) => {
   User.find({ where: { email: follow8.email }})
     .then((user) => {
+      follow8Id = user.id;
       follow8Token = tokenService.generateToken({ id: user.id, email: user.email }, '3d');
       done();
     })
@@ -42,6 +45,7 @@ before((done) => {
 before((done) => {
   User.find({ where: { email: author3.email }})
     .then((user) => {
+      author3Id = user.id;
       author3Token = tokenService.generateToken({ id: user.id, email: user.email }, '3d');
       done();
     })
@@ -58,7 +62,7 @@ before((done) => {
 describe('Test for follow/unfollow endpoints', () => {
   before((done) => {
     chai.request(server)
-      .post(`/api/profiles/${author3.id}/follow`)
+      .post(`/api/profiles/${author3Id}/follow`)
       .set('Authorization', follow7Token)
       .end((err, res) => {
         expect(res.status).to.equal(201);
@@ -81,7 +85,7 @@ describe('Test for follow/unfollow endpoints', () => {
     })
     it('should not be able to follow a user if account has not been verified', (done) => {
       chai.request(server)
-        .post(`/api/profiles/${author3.id}/follow`)
+        .post(`/api/profiles/${author3Id}/follow`)
         .set('Authorization', unverifedToken)
         .end((err, res) => {
           expect(res.status).to.equal(403);
@@ -105,7 +109,7 @@ describe('Test for follow/unfollow endpoints', () => {
     });
     it('should be able to follow another author after login', (done) => {
       chai.request(server)
-        .post(`/api/profiles/${author3.id}/follow`)
+        .post(`/api/profiles/${author3Id}/follow`)
         .set('Authorization', follow5Token)
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -117,7 +121,7 @@ describe('Test for follow/unfollow endpoints', () => {
     })
     it('should not perform the follow operation if already following  the user', (done) => {
       chai.request(server)
-        .post(`/api/profiles/${author3.id}/follow`)
+        .post(`/api/profiles/${author3Id}/follow`)
         .set('Authorization', follow7Token)
         .end((err, res) => {
           expect(res.status).to.equal(422);
@@ -129,7 +133,7 @@ describe('Test for follow/unfollow endpoints', () => {
     })
     it('should not be able to follow itself', (done) => {
       chai.request(server)
-        .post(`/api/profiles/${author3.id}/follow`)
+        .post(`/api/profiles/${author3Id}/follow`)
         .set('Authorization', author3Token)
         .end((err, res) => {
           expect(res.status).to.equal(422);
@@ -156,7 +160,7 @@ describe('Test for follow/unfollow endpoints', () => {
     })
     it('should not be able to unfollow a user if account has not been verified', (done) => {
       chai.request(server)
-        .delete(`/api/profiles/${author3.id}/follow`)
+        .delete(`/api/profiles/${author3Id}/follow`)
         .set('Authorization', unverifedToken)
         .end((err, res) => {
           expect(res.status).to.equal(403);
@@ -180,7 +184,7 @@ describe('Test for follow/unfollow endpoints', () => {
     });
     it('should be able to unfollow another user', (done) => {
       chai.request(server)
-        .delete(`/api/profiles/${author3.id}/follow`)
+        .delete(`/api/profiles/${author3Id}/follow`)
         .set('Authorization', follow7Token)
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -192,7 +196,7 @@ describe('Test for follow/unfollow endpoints', () => {
     })
     it('should not unfollow an author you are not following', (done) => {
       chai.request(server)
-        .delete(`/api/profiles/${follow8.id}/follow`)
+        .delete(`/api/profiles/${follow8Id}/follow`)
         .set('Authorization', follow7Token)
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -218,7 +222,7 @@ describe('Test for follow/unfollow endpoints', () => {
     });
     it('should not be able to view followers if account has not been verified', (done) => {
       chai.request(server)
-        .get(`/api/profiles/${author3.id}/followers`)
+        .get(`/api/profiles/${author3Id}/followers`)
         .set('Authorization', unverifedToken)
         .end((err, res) => {
           expect(res.status).to.equal(403);
@@ -230,7 +234,7 @@ describe('Test for follow/unfollow endpoints', () => {
     })
     it('should not be able get followers if not login', (done) => {
       chai.request(server)
-        .get(`/api/profiles/${author3.id}/followers`)
+        .get(`/api/profiles/${author3Id}/followers`)
         .set('Authorization', null)
         .end((err, res) => {
           expect(res.status).to.equal(401);
@@ -242,7 +246,7 @@ describe('Test for follow/unfollow endpoints', () => {
     })
     it('should return error message with status 404 if no follower is found', (done) => {
       chai.request(server)
-        .get(`/api/profiles/${follow8.id}/followers`)
+        .get(`/api/profiles/${follow8Id}/followers`)
         .set('Authorization', follow8Token)
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -254,7 +258,7 @@ describe('Test for follow/unfollow endpoints', () => {
     });
     it('should return an array of users profile that are following an author', (done) => {
       chai.request(server)
-        .get(`/api/profiles/${author3.id}/followers`)
+        .get(`/api/profiles/${author3Id}/followers`)
         .set('Authorization', author3Token)
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -293,7 +297,7 @@ describe('Test for follow/unfollow endpoints', () => {
   describe('Followings route GET /profiles/:userId/followings', () => {
     before((done) => {
       chai.request(server)
-        .post(`/api/profiles/${follow8.id}/follow`)
+        .post(`/api/profiles/${follow8Id}/follow`)
         .set('Authorization', author3Token)
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -302,7 +306,7 @@ describe('Test for follow/unfollow endpoints', () => {
     });
     it('should not be able get followers if not login', (done) => {
       chai.request(server)
-        .get(`/api/profiles/${author3.id}/followings`)
+        .get(`/api/profiles/${author3Id}/followings`)
         .set('Authorization', null)
         .end((err, res) => {
           expect(res.status).to.equal(401);
@@ -326,7 +330,7 @@ describe('Test for follow/unfollow endpoints', () => {
     });
     it('should not be able to view those following a user if account has not been verified', (done) => {
       chai.request(server)
-        .post(`/api/profiles/${author3.id}/follow`)
+        .post(`/api/profiles/${author3Id}/follow`)
         .set('Authorization', unverifedToken)
         .end((err, res) => {
           expect(res.status).to.equal(403);
@@ -338,7 +342,7 @@ describe('Test for follow/unfollow endpoints', () => {
     })
     it('should return error message with status 404 if you are not following anyone', (done) => {
       chai.request(server)
-        .get(`/api/profiles/${follow8.id}/followings`)
+        .get(`/api/profiles/${follow8Id}/followings`)
         .set('Authorization', follow8Token)
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -362,7 +366,7 @@ describe('Test for follow/unfollow endpoints', () => {
     });
     it('should return an array of users profile that a user is following', (done) => {
       chai.request(server)
-        .get(`/api/profiles/${author3.id}/followings`)
+        .get(`/api/profiles/${author3Id}/followings`)
         .set('Authorization', author3Token)
         .end((err, res) => {
           expect(res.status).to.equal(200);

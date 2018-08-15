@@ -27,7 +27,7 @@ class ArticleController {
       title, description, body,
     } = req.body.article;
 
-      // generating a slug
+    // generating a slug
     const id = uuid();
     const slug = slugCreate(`${title.toLowerCase()}-${id}`);
     const authorId = req.body.decoded.id;
@@ -114,17 +114,10 @@ class ArticleController {
       ],
       order: [['createdAt', 'DESC']],
     })
-      .then((articles) => {
-        if (!articles.count) {
-          return res.status(404).json({
-            message: 'No Articles found',
-          });
-        }
-        return res.status(200).json({
-          articles: articles.rows,
-          articlesCount: articles.count,
-        });
-      })
+      .then(articles => res.status(200).json({
+        articles: articles.rows,
+        articlesCount: articles.count,
+      }))
       .catch(next);
   }
 
