@@ -1,7 +1,6 @@
-
 import { Router } from 'express';
-import oauthRoute from './auth/authRoute';
 import UserController from '../../controllers/UserController';
+import oauthRoute from './auth/authRoute';
 import UsersValidator from '../../utils/middleware/validator/UsersValidator';
 import AuthMiddleware from '../../utils/middleware/AuthMiddleware';
 

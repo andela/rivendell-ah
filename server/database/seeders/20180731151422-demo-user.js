@@ -6,7 +6,7 @@ module.exports = {
     lastName: 'Doe',
     username: 'John Doe',
     email: 'johnDoe@mail.com',
-    hash: '12345678',
+    hash: '1qQw@123',
     createdAt: new Date(),
     updatedAt: new Date(),
   }], {}),

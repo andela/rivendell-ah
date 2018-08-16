@@ -8,14 +8,14 @@ const mockData = {
     email: 'johnwick@gmail.com'
   },
   user2: {
-    firstName: 'Naruto',
-    lastName: 'Uzumaki',
+    firstName: 'Strawhat',
+    lastName: 'Luffy',
     username: 'strawhat',
     email: 'strawhat@gmail.com',
   },
   user3: {
-    firstName: 'Strawhat',
-    lastName: 'Luffy',
+    firstName: 'Naruto',
+    lastName: 'Uzumaki',
     username: 'naruto',
     email: 'naruto@gmail.com',
   },
@@ -33,6 +33,13 @@ const mockData = {
     username: 'badwolf',
     email: 'bigbadwolf@gmail.com',
     password: 'Bigbadw0lf!'
+  },
+  user7: {
+    id: 3,
+    firstName: 'Strawhat',
+    lastName: 'Luffy',
+    username: 'strawhat',
+    email: 'strawhat@gmail.com',
   }
 };
 
