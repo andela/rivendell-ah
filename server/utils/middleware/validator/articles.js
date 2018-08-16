@@ -49,9 +49,39 @@ const updateArticle = (req, res, next) => {
   const validation = validator.updateArticleRules(articleInput);
   if (validation) {
     return res.status(400).json({
+      status: 'fail',
       error: validation,
     });
   }
+
+  if (req.body.article.title === ''
+  || (req.body.article.title
+    && req.body.article.title.trim() === '')) {
+    return res.status(422).json({
+      errors: {
+        message: 'The title must be specified',
+      },
+    });
+  }
+  if (req.body.article.description === ''
+  || (req.body.article.description
+    && req.body.article.description.trim() === '')) {
+    return res.status(422).json({
+      errors: {
+        message: 'The description must be specified',
+      },
+    });
+  }
+  if (req.body.article.body === ''
+  || (req.body.article.body
+    && req.body.article.body.trim() === '')) {
+    return res.status(422).json({
+      errors: {
+        message: 'The body must be specified',
+      },
+    });
+  }
+
   return next();
 };
 

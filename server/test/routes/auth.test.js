@@ -23,6 +23,7 @@ const tempUser = {
     password: '11qQw@123',
   },
 };
+const authTest = () => {
 describe('user test', () => {
   describe('user on signing up', () => {
     describe('signing up with no username', () => {
@@ -245,3 +246,8 @@ describe('user test', () => {
     });
   });
 });
+}
+
+export default authTest;
+
+

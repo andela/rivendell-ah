@@ -1,31 +1,31 @@
-/* eslint-disable */
+'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Articles', {
       id: {
         allowNull: false,
+        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.UUID,
-        defaults: Sequelize.UUIDV4,
+        type: Sequelize.INTEGER
       },
       slug: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING
       },
       title: {
-        type: Sequelize.TEXT,
+        type: Sequelize.TEXT
       },
       description: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING
       },
       body: {
-        type: Sequelize.TEXT,
+        type: Sequelize.TEXT
       },
       image: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATE
       },
       updatedAt: {
         allowNull: false,

@@ -6,7 +6,6 @@ import articleControllerHelper from '../utils/helpers/articleControllerHelper';
 const { Article, User } = models;
 
 /**
- *
  * The ArticleController contains static methods that are used as
  * controllers to handle the different article routes.
  *  @class ArticleController
@@ -43,6 +42,7 @@ class ArticleController {
       .then(article => res.status(201).json({
         article: articleControllerHelper
           .createArticleResponse(article, username, bio, image, slug),
+        message: 'Article Sucessfully Created',
       })).catch(next);
   }
 
@@ -73,11 +73,13 @@ class ArticleController {
       .then((article) => {
         if (!article) {
           return res.status(404).json({
+            status: 'fail',
             message: 'Article not found',
           });
         }
         return res.status(200).json({
           article,
+          message: 'Article Found',
         });
       })
       .catch(next);
@@ -110,6 +112,7 @@ class ArticleController {
       .then((articles) => {
         if (!articles.count) {
           return res.status(404).json({
+            status: 'fail',
             message: 'No Articles found',
           });
         }
@@ -135,11 +138,11 @@ class ArticleController {
       title, description, body,
     } = req.body.article;
     const authorId = req.body.decoded.id;
-    const updateField = [];
+    const fieldsArr = [];
 
-    if (title && title.trim()) updateField.push('title');
-    if (description && description.trim()) updateField.push('description');
-    if (body && body.trim()) updateField.push('body');
+    if (title) fieldsArr.push('title');
+    if (description) fieldsArr.push('description');
+    if (body) fieldsArr.push('body');
 
     Article.update(
       {
@@ -148,17 +151,19 @@ class ArticleController {
       {
         where: { slug: req.params.slug, authorId },
         returning: true,
-        fields: updateField,
+        fields: fieldsArr,
       },
     )
       .then(([updated, article]) => {
         if (!updated) {
           return res.status(404).json({
+            status: 'fail',
             message: 'Article not found. Cannot Update',
           });
         }
         return res.status(200).json({
-          article: article[0],
+          article,
+          message: 'Article Updated',
         });
       })
       .catch(next);
@@ -179,10 +184,14 @@ class ArticleController {
       .then((success) => {
         if (!success) {
           return res.status(404).json({
-            message: 'Article not found',
+            status: 'fail',
+            message: 'Unable to delete Article',
           });
         }
-        return res.status(200).json();
+        return res.status(200).json({
+          status: 'success',
+          message: 'Article Deleted',
+        });
       })
       .catch(next);
   }

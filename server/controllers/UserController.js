@@ -55,8 +55,8 @@ class UserController {
             verified: user.verified,
             token,
           },
-          message: `Sign up successful, visit your email 
-          to verify your account.`,
+          message:
+           'Sign up successful, visit your email to verify your account.',
         });
       })
       .catch(next);

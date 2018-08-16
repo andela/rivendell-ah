@@ -2,10 +2,11 @@ import { Router } from 'express';
 import auth from '../../utils/middleware/AuthMiddleware';
 import validate from '../../utils/middleware/validator/articles';
 import ArticleController from '../../controllers/ArticleController';
+import RatingController from '../../controllers/RatingController';
+import ratingMiddleware from '../../utils/middleware/ratingMiddleware';
 
 
 const router = Router();
-
 router.post(
   '/articles',
   auth.authenticateUser, auth.verifyUser,
@@ -33,6 +34,28 @@ router.delete(
   '/articles/:slug',
   auth.authenticateUser, auth.verifyUser,
   ArticleController.deleteArticle,
+);
+
+// routes for rating articles
+router.post(
+  '/articles/:slug/rating',
+  auth.authenticateUser,
+  auth.verifyUser,
+  ratingMiddleware.validateRating,
+  RatingController.rateArticle,
+);
+
+router.put(
+  '/articles/:slug/rating',
+  auth.authenticateUser,
+  auth.verifyUser,
+  ratingMiddleware.validateRating,
+  RatingController.updateRating,
+);
+
+router.get(
+  '/articles/:slug/rating',
+  RatingController.getArticleRating,
 );
 
 export default router;
