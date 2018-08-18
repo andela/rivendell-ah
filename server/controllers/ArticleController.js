@@ -107,12 +107,14 @@ class ArticleController {
         attributes: [
           'username', 'bio', 'image',
         ],
+        where: req.filterByAuthorAttributes,
       }],
       attributes: [
         'slug', 'title', 'description',
         'body', 'createdAt', 'updatedAt',
       ],
       order: [['createdAt', 'DESC']],
+      where: req.filterByArticleAttributes,
     })
       .then(articles => res.status(200).json({
         articles: articles.rows,

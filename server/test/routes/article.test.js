@@ -15,6 +15,7 @@ const SIGN_UP_ROUTE = '/api/users';
 chai.use(chaiHttp);
 let slug;
 let token;
+let article;
 
 describe('Testing articles routes', () => {
   before((done) => {
@@ -23,7 +24,7 @@ describe('Testing articles routes', () => {
         token = tokenService.generateToken({
           id: user.dataValues.id,
           email: user.dataValues.email,
-        }, '3d') 
+        }, '3d')
         done();
       });
   });
@@ -43,6 +44,7 @@ describe('Testing articles routes', () => {
           expect(res.status).to.equal(201);
           expect(res.body).to.have.property('article');
           slug = res.body.article.slug;
+          article = res.body.article;
           done();
         });
     })
@@ -224,6 +226,115 @@ describe('Testing articles routes', () => {
     })
   })
 
+  describe('Getting Articles by  url Query String', () => {
+    let creationDate, startDate, endDate;
+    before('get articles', (done) => {
+      chai.request(server)
+        .get(`${baseUrl}`)
+        .end((err, res) => {
+          creationDate = res.body.articles[0].createdAt.split('T')[0];
+          startDate = '2018-07-20';
+          endDate = '2050-08-20';
+          done();
+        })
+    });
+    it('should return article(s) with date same as startDate only'
+      + ' if no endDate is specified ', (done) => {
+        chai.request(server)
+          .get(`${baseUrl}?startDate=${creationDate}`)
+          .end((err, res) => {
+            expect(res.status).to.equal(200);
+            expect(res.body).to.have.property('articles');
+            expect(res.body.articles[0].createdAt.split('T')[0]).to.be.equals(creationDate);
+            done();
+          });
+      })
+    it('should return article(s) with date same as endDate only'
+      + ' if no startDate is specified ', (done) => {
+        chai.request(server)
+          .get(`${baseUrl}?endDate=${creationDate}`)
+          .end((err, res) => {
+            expect(res.status).to.equal(200);
+            expect(res.body).to.have.property('articles');
+            expect(res.body.articles[0].createdAt.split('T')[0]).to.be.equals(creationDate);
+            done();
+          });
+      })
+    it('should return article(s) between the specified date range', (done) => {
+      chai.request(server)
+        .get(`${baseUrl}?startDate=${startDate}&endDate=${endDate}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('articles');
+          const lastIndex = res.body.articles.length - 1;
+          expect(Date.parse(res.body.articles[lastIndex].createdAt))
+            .to.be.gte(Date.parse(startDate));
+          expect(Date.parse(res.body.articles[lastIndex].createdAt))
+            .to.be.lte(Date.parse(endDate));
+          done();
+        });
+    })
+    it('should return article(s) by username like the query value', (done) => {
+      chai.request(server)
+        .get(`${baseUrl}?username=${mockTestUser.username}`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('articles');
+          expect(res.body.articles.length).to.be.gte(0);
+          expect(res.body.articles[0].author.username).equals(mockTestUser.username);
+          done();
+        });
+    })
+    it('should default to return all articles (limited by pagination)'
+      + 'if no filter query parameters is specified', (done) => {
+        chai.request(server)
+          .get(`${baseUrl}?limit=10`)
+          .end((err, res) => {
+            const count = res.body.articlesCount;
+            expect(res.status).to.equal(200);
+            expect(res.body).to.have.property('articles');
+            count < 20 ?
+              expect(res.body.articles.length).to.be.equals(count)
+              : expect(res.body.articles.length).to.be.equals(10);
+            done();
+          });
+      })
+    it('should ignore filter if invalid values are set'
+      + ' to startDate and endDate fields', (done) => {
+        chai.request(server)
+          .get(`${baseUrl}?startDate=notvalid&endDate=invalidDate`)
+          .end((err, res) => {
+            const count = res.body.articlesCount;
+            expect(res.status).to.equal(200);
+            expect(res.body).to.have.property('articles');
+            count < 20 ?
+              expect(res.body.articles.length).to.be.equals(count)
+              : expect(res.body.articles.length).to.be.equals(10);
+            done();
+          });
+      })
+    it('should return an empty array if no article match query values', (done) => {
+      chai.request(server)
+        .get(`${baseUrl}?username=novaluematchesquery`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('articles');
+          expect(res.body.articles.length).equals(0);
+          done();
+        });
+    })
+    it('should ignore query fields if not valid', (done) => {
+      chai.request(server)
+        .get(`${baseUrl}?invalid=baduser`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('articles');
+          expect(res.body.articles.length).to.be.gte(1);
+          done();
+        });
+    })
+  })
+
   describe('Updating an Article', () => {
     it('Should sucessfully update an Article', (done) => {
       chai.request(server)
@@ -396,4 +507,4 @@ describe('Testing articles routes', () => {
         });
     })
   })
-})
+});
