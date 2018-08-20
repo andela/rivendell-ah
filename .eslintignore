@@ -2,7 +2,6 @@
 /coverage/**
 server/migrations/**
 server/seeders/**
-
+server/test/**
 .env
-package-lock.json
 

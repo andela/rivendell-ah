@@ -25,7 +25,6 @@ class OauthController {
    * @param {object} profile an object containing the data of the user
    * @param {function} done  fuunction that must be called once all
    * processing is complete
-   * @author Oguejiofor Chidiebere
   * @returns {void} void
    */
   static passportCallback(accessToken, refreshToken, profile, done) {
@@ -40,6 +39,7 @@ class OauthController {
       email,
       firstName,
       lastName,
+      verified: true,
       image: profile.photos[0] ? profile.photos[0].value : undefined,
     };
     User.findOrCreate({
@@ -57,7 +57,6 @@ class OauthController {
    * @param {object} req this object contains the details of the request
    * @param {object} res this is used to send a response to the user
    * @returns {void} void
-   * @author Oguejiofor Chidiebere
    */
   static handleRedirect(req, res) {
     const { user } = req;

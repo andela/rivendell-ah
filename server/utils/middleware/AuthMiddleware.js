@@ -22,8 +22,7 @@ class AuthMiddleware {
       return res.status(401)
         .json({ errors: { message: 'Authentication failed' } });
     }
-    const { id } = decoded;
-    return User.findById(id)
+    return User.findById(decoded.id)
       .then((user) => {
         if (!user) {
           return res.status(404)
@@ -52,9 +51,7 @@ class AuthMiddleware {
           },
         });
     }
-    req.body.decoded.verified = req.user.verified;
     return next();
   }
 }
-
 export default AuthMiddleware;

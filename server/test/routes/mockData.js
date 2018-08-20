@@ -5,7 +5,7 @@ const mockData = {
     firstName: 'John',
     lastName: 'Wick',
     username: 'black',
-    email: 'johnwick@gmail.com'
+    email: 'johnwick@gmail.com',
   },
   user2: {
     firstName: 'Strawhat',
@@ -40,7 +40,26 @@ const mockData = {
     lastName: 'Luffy',
     username: 'strawhat',
     email: 'strawhat@gmail.com',
-  }
+    password: 'Bigbadw0lf!',
+  },
+  likeUser: {
+    id: 10,
+    firstName: 'Chidiebere',
+    lastName: 'TheGreat',
+    username: 'username101',
+    hash: 'R!vend1elLl121//',
+    verified: true,
+    email: 'username1e12@gmail.com',
+  },
+  unverifiedUser: {
+    id: 11,
+    firstName: 'Stevo',
+    lastName: 'mainMan',
+    username: 'stevemain10101',
+    hash: 'R!vend1elLl121//',
+    verified: false,
+    email: 'userwithName@gmail.com',
+  },
 };
 
 export default mockData;

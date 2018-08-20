@@ -4,7 +4,7 @@ import articleRouter from './articles';
 
 const router = Router();
 router.use('/', userRouter);
-router.use('/', articleRouter);
+router.use('/articles', articleRouter);
 router.use((err, req, res, next) => {
   if (err.name === 'ValidationError') {
     return res.status(422).json({

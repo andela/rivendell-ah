@@ -4,6 +4,7 @@ import oauthRoute from './auth/authRoute';
 import UsersValidator from '../../utils/middleware/validator/UsersValidator';
 import AuthMiddleware from '../../utils/middleware/AuthMiddleware';
 
+
 const router = Router();
 
 router.use('/auth', oauthRoute);

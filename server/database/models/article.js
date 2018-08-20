@@ -39,7 +39,12 @@ export default (sequelize, DataTypes) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
       as: 'author',
-
+    });
+    Article.hasMany(models.ArticleLike, {
+      foreignKey: 'articleId',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+      as: 'likes',
     });
   };
   return Article;
