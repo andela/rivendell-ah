@@ -35,7 +35,6 @@ const mockData = {
     password: 'Bigbadw0lf!'
   },
   user7: {
-    id: 3,
     firstName: 'Strawhat',
     lastName: 'Luffy',
     username: 'strawhat',
