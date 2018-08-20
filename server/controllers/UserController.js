@@ -306,6 +306,7 @@ class UserController {
    * @param {Object} res the response body
    * @param {function} next a call to the next function
    * @returns {Object} the response body
+   * @return {Object} the response body
    */
   static resetPasswordUpdate(req, res, next) {
     const { resetToken, password } = req;

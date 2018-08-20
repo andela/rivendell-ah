@@ -2,7 +2,6 @@
 /* eslint no-param-reassign: off */
 import crypto from 'crypto';
 
-
 export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
     firstName: {
@@ -68,6 +67,20 @@ export default (sequelize, DataTypes) => {
     User.hasMany(models.ArticleLike, {
       foreignKey: 'userId',
       as: 'likes',
+    });
+
+    User.belongsToMany(User, {
+      as: 'followings',
+      through: models.Follow,
+      foreignKey: 'followerId',
+      onDelete: 'cascade',
+    });
+
+    User.belongsToMany(User, {
+      as: 'followers',
+      through: models.Follow,
+      foreignKey: 'followingId',
+      onDelete: 'cascade',
     });
   };
   return User;

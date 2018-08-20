@@ -47,6 +47,7 @@ class AuthMiddleware {
       return res.status(403)
         .json({
           errors: {
+            status: 'fail',
             message: 'Your account has not been verified',
           },
         });

@@ -8,7 +8,6 @@ import chaiHttp from 'chai-http';
 import server from '../../index';
 
 
-
 const SIGN_UP_ROUTE = '/api/users';
 const LOGIN_ROUTE = '/api/users/login';
 use(chaiHttp);
