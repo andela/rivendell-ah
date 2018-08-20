@@ -1,15 +1,15 @@
 import { Router } from 'express';
 import UserController from '../../controllers/UserController';
-import oauthRoute from './auth/authRoute';
 import UsersValidator from '../../utils/middleware/validator/UsersValidator';
 import AuthMiddleware from '../../utils/middleware/AuthMiddleware';
 
 
 const router = Router();
 
-router.use('/auth', oauthRoute);
 router.get(
-  '/user', UserController.get,
+  '/user',
+  AuthMiddleware.authenticateUser,
+  UserController.get,
 );
 
 router.put(
@@ -24,7 +24,7 @@ router.post(
 );
 
 router.post(
-  '/users/login', UserController.login,
+  '/users/login', UsersValidator.login, UserController.login,
 );
 
 router.post(
@@ -52,6 +52,6 @@ router.put(
 
 router.get('/profiles/:username', UserController.getProfile);
 
-router.get('/profiles', UserController.getAllProfile);
+router.get('/profiles', UserController.getAllProfiles);
 
 export default router;

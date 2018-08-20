@@ -1,5 +1,7 @@
 import sequelize from 'sequelize';
 import models from '../database/models';
+import errorHelper from '../utils/helpers/errorHelper';
+import ratingControllerHelper from '../utils/helpers/ratingControllerHelper';
 
 const { Article, Rating } = models;
 
@@ -26,59 +28,32 @@ class RatingController {
     return Article
       .find({ where: { slug } })
       .then((article) => {
-        if (!article) {
-          return res.status(404).json({
-            errors: { message: 'Article not found' },
-          });
-        }
-        if (article.authorId === userId) {
-          return res.status(403).json({
-            errors: {
-              message: 'You can\'t provide ratings for your article',
-            },
-          });
-        }
+        ratingControllerHelper.validateRating(article, userId);
         return Rating
           .findOrCreate({
-            where: {
-              userId,
-              articleId: article.id,
-            },
+            where: { userId, articleId: article.id },
             defaults: { rating },
-          })
-          .spread((rateData, rated) => {
-            if (rated) {
-              return Rating.findOne({
-                where: { articleId: article.id },
-                attributes: [
-                  [sequelize.fn('SUM', sequelize.col('rating')),
-                    'totalRating'],
-                  [sequelize.fn('COUNT', sequelize.col('rating')),
-                    'ratingCount'],
-                  [sequelize.fn('AVG', sequelize.col('rating')),
-                    'averageRating'],
-                ],
-              }).then((ratingStats) => {
-                const ratingStatus = ratingStats.dataValues;
-
-                // the plus + sign below is stringify the returned data
-                ratingStatus.averageRating = +ratingStatus.averageRating;
-                ratingStatus.averageRating = ratingStatus
-                  .averageRating.toPrecision(3);
-                return res.status(201).json({
-                  ratingDetails: ratingStatus,
-                  rating: rateData,
-                });
-              });
+          }).spread((rateData, rated) => {
+            if (!rated) {
+              errorHelper
+                .throwError('Your rating have already been recorded', 403);
             }
-            return res.status(403).json({
-              errors: {
-                message: 'Your rating have already been recoded',
-              },
+            return Rating.findOne({
+              where: { articleId: article.id },
+              attributes: ratingControllerHelper.ratingAttributes(sequelize),
+            }).then((ratingStats) => {
+              const ratingStatus = ratingStats.dataValues;
+              // the plus + sign below is stringify the returned data
+              ratingStatus.averageRating = +ratingStatus.averageRating;
+              ratingStatus.averageRating = ratingStatus
+                .averageRating.toPrecision(3);
+              return res.status(201).json({
+                ratingDetails: ratingStatus,
+                rating: rateData,
+              });
             });
           });
-      })
-      .catch(next);
+      }).catch(next);
   }
 
   /**
@@ -99,18 +74,7 @@ class RatingController {
     return Article
       .find({ where: { slug } })
       .then((article) => {
-        if (!article) {
-          return res.status(404).json({
-            errors: { message: 'Article not found' },
-          });
-        }
-        if (article.authorId === userId) {
-          return res.status(403).json({
-            errors: {
-              message: 'You can\'t provide ratings for your article',
-            },
-          });
-        }
+        ratingControllerHelper.validateRating(article, userId);
         return Rating
           .update(
             { rating },
@@ -121,40 +85,27 @@ class RatingController {
               },
               returning: true,
             },
-          )
-          .then(([updated, updatedRating]) => {
-            if (updated) {
-              return Rating.findOne({
-                where: { articleId: article.id },
-                attributes: [
-                  [sequelize.fn('SUM', sequelize.col('rating')),
-                    'totalRating'],
-                  [sequelize.fn('COUNT', sequelize.col('rating')),
-                    'ratingCount'],
-                  [sequelize.fn('AVG', sequelize.col('rating')),
-                    'averageRating'],
-                ],
-              }).then((ratingStats) => {
-                const ratingStatus = ratingStats.dataValues;
-
-                // the plus + sign below is stringify the returned data
-                ratingStatus.averageRating = +ratingStatus.averageRating;
-                ratingStatus.averageRating = ratingStatus
-                  .averageRating.toPrecision(3);
-                return res.status(200).json({
-                  ratingDetails: ratingStatus,
-                  rating: updatedRating[0],
-                });
-              });
+          ).then(([updated, updatedRating]) => {
+            if (!updated) {
+              errorHelper
+                .throwError('Rating not found, no update was made', 404);
             }
-            return res.status(404).json({
-              errors: {
-                message: 'Rating not found, no update was made',
-              },
+            return Rating.findOne({
+              where: { articleId: article.id },
+              attributes: ratingControllerHelper.ratingAttributes(sequelize),
+            }).then((ratingStats) => {
+              const ratingStatus = ratingStats.dataValues;
+              // the plus + sign below is stringify the returned data
+              ratingStatus.averageRating = +ratingStatus.averageRating;
+              ratingStatus.averageRating = ratingStatus
+                .averageRating.toPrecision(3);
+              return res.status(200).json({
+                ratingDetails: ratingStatus,
+                rating: updatedRating[0],
+              });
             });
           });
-      })
-      .catch(next);
+      }).catch(next);
   }
 
   /**
@@ -174,28 +125,13 @@ class RatingController {
       .find({
         where: { slug },
         include: [{ model: Rating, as: 'ratings' }],
-      })
-      .then((article) => {
-        if (!article) {
-          return res.status(404).json({
-            errors: {
-              message: 'Article not found',
-            },
-          });
-        }
+      }).then((article) => {
+        if (!article) errorHelper.throwError('Article not found', 404);
         return Rating.findOne({
           where: { articleId: article.id },
-          attributes: [
-            [sequelize.fn('SUM', sequelize.col('rating')),
-              'totalRating'],
-            [sequelize.fn('COUNT', sequelize.col('rating')),
-              'ratingCount'],
-            [sequelize.fn('AVG', sequelize.col('rating')),
-              'averageRating'],
-          ],
+          attributes: ratingControllerHelper.ratingAttributes(sequelize),
         }).then((ratingStats) => {
           const ratingStatus = ratingStats.dataValues;
-
           // the plus + sign below is stringify the returned data
           ratingStatus.averageRating = +ratingStatus.averageRating;
           ratingStatus.averageRating = ratingStatus

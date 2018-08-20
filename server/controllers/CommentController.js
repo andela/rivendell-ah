@@ -35,8 +35,7 @@ class CommentController {
         const comment = Object
           .assign(dataValues, { author: { username, image } });
         res.status(201).json({ comment });
-      })
-      .catch(next);
+      }).catch(next);
   }
 
   /**
@@ -64,8 +63,7 @@ class CommentController {
         const comment = Object
           .assign(dataValues, { author: { username, image } });
         res.status(201).json({ comment });
-      })
-      .catch(next);
+      }).catch(next);
   }
 
   /**
@@ -88,17 +86,11 @@ class CommentController {
     })
       .then(([updated, comment]) => {
         if (!updated) {
-          return res.status(404)
-            .json({
-              errors: {
-                message: 'Comment not found, or you do '
-                  + 'not have permission to update this comment',
-              },
-            });
+          errorHelper.throwError('Comment not found, or you do '
+          + 'not have permission to update this comment', 404);
         }
         return res.status(200).json({ comment: comment[0] });
-      })
-      .catch(next);
+      }).catch(next);
   }
 
   /**
@@ -116,15 +108,13 @@ class CommentController {
     })
       .then((rawComments) => {
         if (!rawComments.length) {
-          return res.status(404)
-            .json({ errors: { message: 'Comment not found' } });
+          errorHelper.throwError('Comment not found', 404);
         }
         const comment = commentCtrlHelper.parseComments(rawComments)[0];
         const commentsCount = rawComments[0].totalCount;
         return res.status(200)
           .json({ comment, commentsCount });
-      })
-      .catch(next);
+      }).catch(next);
   }
 
   /**
@@ -156,8 +146,7 @@ class CommentController {
         const commentsCount = rawComments[0] ? rawComments[0].totalCount : 0;
         return res.status(200)
           .json({ comments, commentsCount });
-      })
-      .catch(next);
+      }).catch(next);
   }
 
   /**
@@ -189,8 +178,7 @@ class CommentController {
         const commentsCount = rawComments[0] ? rawComments[0].totalCount : 0;
         return res.status(200)
           .json({ comments, commentsCount });
-      })
-      .catch(next);
+      }).catch(next);
   }
 
   /**
@@ -208,12 +196,10 @@ class CommentController {
     })
       .then(([deleted]) => {
         if (!deleted) {
-          return res
-            .status(404).json({ errors: { message: 'Comment not found' } });
+          errorHelper.throwError('Comment not found', 404);
         }
         return res.status(204).send();
-      })
-      .catch(next);
+      }).catch(next);
   }
 }
 

@@ -349,7 +349,7 @@ describe('Article rating', () => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('errors');
           expect(res.body.errors).to.have.property('message');
-          expect(res.body.errors.message).to.equal('Your rating have already been recoded');
+          expect(res.body.errors.message).to.equal('Your rating have already been recorded');
           done();
         });
     });

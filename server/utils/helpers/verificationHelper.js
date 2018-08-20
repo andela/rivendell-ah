@@ -30,16 +30,14 @@ export default {
       return {
         status: false,
         statusCode: 404,
-        error: { errors: { message: 'User not found in the database' } },
+        error: 'User not found in the database',
       };
     }
     if (user.verified) {
       return {
         status: false,
         statusCode: 409,
-        error: {
-          errors: { message: 'Your account has already been verified' },
-        },
+        error: 'Your account has already been verified',
       };
     }
     return { status: true };
@@ -54,16 +52,15 @@ export default {
       return {
         status: false,
         statusCode: 400,
-        error: { errors: { message: 'Email not provided' } },
+        error: 'Email not provided',
       };
     }
     const regEx = /^.+@.+\..+$/;
     if (!regEx.test(email)) {
       return {
+        status: false,
         statusCode: 400,
-        error: {
-          status: false, errors: { message: 'Please provide a valid email' },
-        },
+        error: 'Please provide a valid email',
       };
     }
     return { status: true };

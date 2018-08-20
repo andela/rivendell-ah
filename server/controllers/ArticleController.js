@@ -2,6 +2,7 @@ import slugCreate from 'slug';
 import uuid from 'uuid/v1';
 import models from '../database/models';
 import articleControllerHelper from '../utils/helpers/articleControllerHelper';
+import errorHelper from '../utils/helpers/errorHelper';
 
 const { Article, User } = models;
 
@@ -26,24 +27,17 @@ class ArticleController {
     const {
       title, description, body,
     } = req.body.article;
-
     // generating a slug
     const id = uuid();
     const slug = slugCreate(`${title.toLowerCase()}-${id}`);
     const authorId = req.body.decoded.id;
-
-
-    const {
-      username, bio, image,
-    } = req.user;
-
+    const { username, bio, image } = req.user;
     Article.create({
       id, slug, title, description, body, authorId,
-    })
-      .then(article => res.status(201).json({
-        article: articleControllerHelper
-          .createArticleResponse(article, username, bio, image, slug),
-      })).catch(next);
+    }).then(article => res.status(201).json({
+      article: articleControllerHelper
+        .createArticleResponse(article, username, bio, image, slug),
+    })).catch(next);
   }
 
   /**
@@ -58,29 +52,16 @@ class ArticleController {
   static getArticle(req, res, next) {
     Article.find({
       where: { slug: req.params.slug },
-      include: [{
-        model: User,
-        as: 'author',
-        attributes: [
-          'username', 'bio', 'image',
-        ],
-      }],
-      attributes: [
-        'slug', 'title', 'description',
-        'body', 'createdAt', 'updatedAt',
-      ],
-    })
-      .then((article) => {
-        if (!article) {
-          return res.status(404).json({
-            message: 'Article not found',
-          });
-        }
-        return res.status(200).json({
-          article,
-        });
-      })
-      .catch(next);
+      include: articleControllerHelper
+        .includeAuthor(User),
+      attributes: articleControllerHelper
+        .articleAttributes(),
+    }).then((article) => {
+      if (!article) {
+        errorHelper.throwError('Article not found', 404);
+      }
+      return res.status(200).json({ article });
+    }).catch(next);
   }
 
   /**
@@ -97,30 +78,19 @@ class ArticleController {
     limit = +limit < 20 && +limit > 0 ? +limit : 20;
     page = +page > 0 ? +page : 1;
     const offset = limit * (page - 1);
-
     Article.findAndCountAll({
       limit,
       offset,
-      include: [{
-        model: User,
-        as: 'author',
-        attributes: [
-          'username', 'bio', 'image',
-        ],
-        where: req.filterByAuthorAttributes,
-      }],
-      attributes: [
-        'slug', 'title', 'description',
-        'body', 'createdAt', 'updatedAt',
-      ],
+      include: articleControllerHelper
+        .includeAuthor(User, req.filterByAuthorAttributes),
+      attributes: articleControllerHelper
+        .articleAttributes(),
       order: [['createdAt', 'DESC']],
       where: req.filterByArticleAttributes,
-    })
-      .then(articles => res.status(200).json({
-        articles: articles.rows,
-        articlesCount: articles.count,
-      }))
-      .catch(next);
+    }).then(articles => res.status(200).json({
+      articles: articles.rows,
+      articlesCount: articles.count,
+    })).catch(next);
   }
 
   /**
@@ -133,37 +103,27 @@ class ArticleController {
    * @returns {Object} the response body
    */
   static updateArticle(req, res, next) {
-    const {
-      title, description, body,
-    } = req.body.article;
+    const { title, description, body } = req.body.article;
     const authorId = req.body.decoded.id;
     const updateField = [];
-
     if (title && title.trim()) updateField.push('title');
     if (description && description.trim()) updateField.push('description');
     if (body && body.trim()) updateField.push('body');
-
     Article.update(
-      {
-        title, description, body,
-      },
+      { title, description, body },
       {
         where: { slug: req.params.slug, authorId },
         returning: true,
         fields: updateField,
       },
-    )
-      .then(([updated, article]) => {
-        if (!updated) {
-          return res.status(404).json({
-            message: 'Article not found. Cannot Update',
-          });
-        }
-        return res.status(200).json({
-          article: article[0],
-        });
-      })
-      .catch(next);
+    ).then(([updated, article]) => {
+      if (!updated) {
+        errorHelper.throwError('Article not found. Cannot Update', 404);
+      }
+      return res.status(200).json({
+        article: article[0],
+      });
+    }).catch(next);
   }
 
   /**
@@ -180,13 +140,10 @@ class ArticleController {
     Article.destroy({ where: { slug: req.params.slug, authorId } })
       .then((success) => {
         if (!success) {
-          return res.status(404).json({
-            message: 'Article not found',
-          });
+          errorHelper.throwError('Article not found', 404);
         }
         return res.status(200).json();
-      })
-      .catch(next);
+      }).catch(next);
   }
 }
 

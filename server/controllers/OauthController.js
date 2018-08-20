@@ -76,7 +76,6 @@ class OauthController {
         username: user.username,
       },
       message: 'Successfully authenticated the user',
-
     });
   }
 }

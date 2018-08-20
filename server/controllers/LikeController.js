@@ -1,5 +1,6 @@
 import db from '../database/models';
 import helper from '../utils/helpers/likeControllerHelper';
+import errorHelper from '../utils/helpers/errorHelper';
 
 const { Article, ArticleLike, User } = db;
 
@@ -23,7 +24,6 @@ class LikeController {
   static likeArticle(req, res, next) {
     const { slug } = req.params;
     const { decoded: user } = req.body;
-
     Article.findOne({
       where: { slug },
       attributes: ['id', 'title', 'slug'],
@@ -34,16 +34,10 @@ class LikeController {
       },
     }).then((article) => {
       if (!article) {
-        return res.status(404).json({
-          errors: {
-            message: 'Article with that slug was not found',
-          },
-        });
+        errorHelper
+          .throwError('Article with that slug was not found', 404);
       }
-      const likeObj = {
-        userId: user.id,
-        articleId: article.id,
-      };
+      const likeObj = { userId: user.id, articleId: article.id };
       return ArticleLike.findOrCreate({
         where: likeObj,
         defaults: likeObj,
@@ -72,33 +66,21 @@ class LikeController {
   static unlikeArticle(req, res, next) {
     const { slug } = req.params;
     const { decoded: user } = req.body;
-
-
     Article.findOne({ where: { slug } })
       .then((article) => {
         if (!article) {
-          return res.status(404).json({
-            errors: {
-              message: 'The Article you specified does not exist',
-            },
-          });
+          errorHelper
+            .throwError('The Article you specified does not exist', 404);
         }
         return ArticleLike.destroy({
-          where: {
-            userId: user.id,
-            articleId: article.id,
-          },
-        }).then((deleted) => {
-          if (!deleted) {
-            return res.status(400).json({
-              errors: {
-                message: 'You had not previously liked the article',
-              },
-
-            });
-          }
-          return res.sendStatus(204);
+          where: { userId: user.id, articleId: article.id },
         });
+      }).then((deleted) => {
+        if (!deleted) {
+          errorHelper
+            .throwError('You had not previously liked the article', 400);
+        }
+        return res.sendStatus(204);
       }).catch(next);
   }
 
@@ -121,11 +103,8 @@ class LikeController {
     let { limit } = req.query;
     const { page } = req.query;
     const articleId = helper.extractId(slug);
-
     limit = limit < 50 && limit > 0 ? limit : 50;
     const offset = page > 0 ? ((page - 1) * limit) : 0;
-
-
     ArticleLike.findAndCountAll({
       where: { articleId },
       include: [{
@@ -152,6 +131,5 @@ class LikeController {
     }).catch(next);
   }
 }
-
 
 export default LikeController;

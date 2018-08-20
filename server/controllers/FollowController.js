@@ -1,5 +1,6 @@
 import models from '../database/models';
-import userProfile from '../utils/helpers/profileHelper';
+import errorHelper from '../utils/helpers/errorHelper';
+import followControllerHelper from '../utils/helpers/followControllerHelper';
 
 const { User, Follow } = models;
 
@@ -12,7 +13,7 @@ const { User, Follow } = models;
  */
 class FollowController {
   /**
-   * add a user to the follower list of an user
+   * add a user to the follower list of another user
    * @param {Object} req the request body
    * @param {Object} res the response body
    * @param {function} next a call to the next function
@@ -21,37 +22,28 @@ class FollowController {
   static follow(req, res, next) {
     const { id: followerId } = req.body.decoded;
     const followingId = parseInt(req.params.userId, 10);
-
-    // Ensure a user cannot unfollow him/her self
+    // Ensure a user cannot follow him/her self
     if (followingId === followerId) {
-      return res.status(422).json({
-        errors: { message: 'You cannot follow yourself' },
-      });
+      errorHelper.throwError('You cannot follow yourself', 422);
     }
     // Get the user being followed
     User.findById(followingId)
       .then((user) => {
-        // Return error message if user is not found
         if (!user) {
-          return res.status(404).json({
-            errors: { message: 'User not found' },
-          });
+          errorHelper.throwError('User not found', 404);
         }
-        Follow.findOrCreate({ where: { followerId, followingId } })
+        return Follow.findOrCreate({ where: { followerId, followingId } })
           .spread((userFollower, created) => {
-            // No action is performed if you already following an user
             if (!created) {
-              return res.status(422).json({
-                errors: { message: 'You are already following this User' },
-              });
+              errorHelper
+                .throwError('You are already following this User', 422);
             }
             // Return user's profile
             return res.status(201).json({
-              profile: userProfile(user, true),
+              profile: followControllerHelper.userProfile(user, true),
             });
           });
       }).catch(next);
-    return null;
   }
 
   /**
@@ -64,37 +56,28 @@ class FollowController {
   static unfollow(req, res, next) {
     const { userId: followingId } = req.params;
     const { id: followerId } = req.body.decoded;
-
     // Get the user being followed
     User.findById(followingId)
       .then((user) => {
-        // Return error message if user is not found
         if (!user) {
-          return res.status(404).json({
-            errors: { message: 'User not found' },
-          });
+          errorHelper.throwError('User not found', 404);
         }
         // Remove user-follower relationship
-        user.removeFollower(followerId)
+        return user.removeFollower(followerId)
           .then((follow) => {
             if (!follow) {
-              return res.status(404).json({
-                errors: {
-                  message: 'You are not following this author',
-                },
-              });
+              errorHelper.throwError('You are not following this author', 404);
             }
             // Return user's profile
             return res.status(200).json({
-              profile: userProfile(user, false),
+              profile: followControllerHelper.userProfile(user, false),
             });
           });
       }).catch(next);
-    return null;
   }
 
   /**
-   * returns all the followers of a login user
+   * returns all the followers of a logged in user
    * or the specified user
    * @param {Object} req the request body
    * @param {Object} res the response body
@@ -104,52 +87,29 @@ class FollowController {
   static getFollowers(req, res, next) {
     const otherUser = req.params.userId;
     const userId = otherUser || req.body.decoded.id;
-
     User.findAndCountAll({
       where: { id: userId },
-      attributes: ['id', 'username'],
-      include: [{
-        model: User,
-        as: 'followers',
-        through: {
-          attributes: [],
-        },
-        attributes: [
-          'firstName', 'lastName', 'username',
-          'bio', 'image',
-        ],
-      }],
-    })
-      .then((followers) => {
-        const followersProfile = followers.rows[0].followers;
-        if (!followersProfile.length) {
-          // return error message if user has no follower
-          const errorMessage = otherUser
-            ? 'This user does not have any follower'
-            : 'You don\'t have any follower';
-          return res.status(404).json({
-            errors: { message: errorMessage },
-          });
-        }
-        return res.status(200).json({
-          followers: followersProfile,
-          totalFollowers: followers.count,
-        });
-      })
-      .catch((err) => {
-        // Return custom error message if user does not exist
-        if (err.message === 'Cannot read property'
-        + ' \'followers\' of undefined') {
-          return res.status(404).json({
-            errors: { message: 'User not found' },
-          });
-        }
-        return next(err);
+      attributes: followControllerHelper
+        .userAttributes(),
+      include: followControllerHelper
+        .includeUser(User, 'followers'),
+    }).then((followers) => {
+      if (!followers.rows[0]) {
+        errorHelper.throwError('User not found', 404);
+      }
+      const followersProfile = followers.rows[0].followers;
+      // set totalFollowers to zero(0) if user has no followers
+      const totalFollowers = followersProfile.length
+        ? followers.count : 0;
+      return res.status(200).json({
+        followers: followersProfile,
+        totalFollowers,
       });
+    }).catch(next);
   }
 
   /**
-   * return all those a login user or the
+   * return all those a logged in user or the
    * the specified user is following
    * @param {Object} req the request body
    * @param {Object} res the response body
@@ -159,48 +119,25 @@ class FollowController {
   static getFollowings(req, res, next) {
     const otherUser = req.params.userId;
     const userId = otherUser || req.body.decoded.id;
-
     User.findAndCountAll({
       where: { id: userId },
-      attributes: ['id', 'username'],
-      include: [{
-        model: User,
-        as: 'followings',
-        through: {
-          attributes: [],
-        },
-        attributes: [
-          'firstName', 'lastName', 'username',
-          'bio', 'image',
-        ],
-      }],
-    })
-      .then((followings) => {
-        const followingsProfile = followings.rows[0].followings;
-        if (!followingsProfile.length) {
-          // return error message if user has no follower
-          const errorMessage = otherUser
-            ? 'This user is not following anyone'
-            : 'You are not following anyone';
-          return res.status(404).json({
-            errors: { message: errorMessage },
-          });
-        }
-        return res.status(200).json({
-          followings: followingsProfile,
-          totalFollowings: followings.count,
-        });
-      })
-      .catch((err) => {
-        // Return custom error message if user does not exist
-        if (err.message === 'Cannot read property'
-        + ' \'followings\' of undefined') {
-          return res.status(404).json({
-            errors: { message: 'User not found' },
-          });
-        }
-        return next(err);
+      attributes: followControllerHelper
+        .userAttributes(),
+      include: followControllerHelper
+        .includeUser(User, 'followings'),
+    }).then((followings) => {
+      if (!followings.rows[0]) {
+        errorHelper.throwError('User not found', 404);
+      }
+      const followingsProfile = followings.rows[0].followings;
+      // set totalFollowings to zero(0) if user is not following anyone
+      const totalFollowings = followingsProfile.length
+        ? followings.count : 0;
+      return res.status(200).json({
+        followings: followingsProfile,
+        totalFollowings,
       });
+    }).catch(next);
   }
 }
 

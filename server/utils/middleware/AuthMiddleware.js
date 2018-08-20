@@ -1,5 +1,6 @@
 import tokenService from '../services/tokenService';
 import models from '../../database/models';
+import errorHelper from '../helpers/errorHelper';
 
 const { User } = models;
 
@@ -19,18 +20,18 @@ class AuthMiddleware {
     let decoded;
     if (token) decoded = tokenService.verifyToken(token);
     if (!decoded) {
-      return res.status(401)
-        .json({ errors: { message: 'Authentication failed' } });
+      errorHelper
+        .throwError('Authentication failed', 401);
     }
-    return User.findById(decoded.id)
+    User.findById(decoded.id)
       .then((user) => {
         if (!user) {
-          return res.status(404)
-            .json({ errors: { message: 'User not found' } });
+          errorHelper
+            .throwError('User not found', 404);
         }
         req.user = user;
         req.body.decoded = decoded;
-        return next();
+        next();
       })
       .catch(next);
   }
@@ -44,15 +45,10 @@ class AuthMiddleware {
    */
   static verifyUser(req, res, next) {
     if (!req.user.verified) {
-      return res.status(403)
-        .json({
-          errors: {
-            status: 'fail',
-            message: 'Your account has not been verified',
-          },
-        });
+      errorHelper
+        .throwError('Your account has not been verified', 403);
     }
-    return next();
+    next();
   }
 }
 export default AuthMiddleware;

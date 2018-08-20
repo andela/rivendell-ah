@@ -1,5 +1,5 @@
 /**
- * An abstraction for the error 404: not found
+ * An abstraction of error response
  * @param {String} message the error message
  * @param {Number} status status code
  * @returns {Object} an error

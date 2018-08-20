@@ -96,7 +96,7 @@ describe('Comment routes', () => {
           expect(res.status).to.equal(400);
           expect(res.body).to.haveOwnProperty('errors')
             .to.haveOwnProperty('message')
-            .to.equal('comment body is required');
+            .to.equal('Comment body is required');
           done();
         });
     });

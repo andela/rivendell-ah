@@ -9,7 +9,6 @@ const articleFilters = (req, res, next) => {
     title, description, body, startDate, endDate,
     username, firstName, lastName,
   } = req.query;
-
   req.filterByArticleAttributes = {
     [Op.and]: [
       {
@@ -34,7 +33,6 @@ const articleFilters = (req, res, next) => {
       },
     ],
   };
-
   req.filterByAuthorAttributes = {
     username: {
       [Op.like]: `%${username || ''}%`,
