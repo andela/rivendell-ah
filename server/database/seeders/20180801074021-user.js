@@ -102,6 +102,15 @@ module.exports = {
       verified: true,
       createdAt: new Date(),
       updatedAt: new Date(),
+    },{
+      firstName: 'Tager',
+      lastName: 'Author',
+      username: 'authorTager',
+      hash: 'R!vend1elLl121//',
+      verified: true,
+      email: 'authortager@gmail.com',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }], {});
   },
 

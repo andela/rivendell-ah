@@ -4,7 +4,7 @@ import models from '../database/models';
 import articleControllerHelper from '../utils/helpers/articleControllerHelper';
 import errorHelper from '../utils/helpers/errorHelper';
 
-const { Article, User } = models;
+const { Article, User, Tag } = models;
 
 /**
  *
@@ -25,19 +25,36 @@ class ArticleController {
    */
   static createArticle(req, res, next) {
     const {
-      title, description, body,
+      title, description, body, tags,
     } = req.body.article;
     // generating a slug
     const id = uuid();
     const slug = slugCreate(`${title.toLowerCase()}-${id}`);
     const authorId = req.body.decoded.id;
-    const { username, bio, image } = req.user;
-    Article.create({
+
+
+    const {
+      username, bio, image,
+    } = req.user;
+
+    const newArticle = {
       id, slug, title, description, body, authorId,
-    }).then(article => res.status(201).json({
-      article: articleControllerHelper
-        .createArticleResponse(article, username, bio, image, slug),
-    })).catch(next);
+    };
+
+    Article.create(newArticle)
+      .then((article) => {
+        articleControllerHelper.createAndFindTags(tags)
+          .then((tagInstances) => {
+            article.addTags(tagInstances)
+              .then(() => {
+                const articleResponse = articleControllerHelper
+                  .createArticleResponse(article, username, bio, image);
+                articleResponse.tags = articleControllerHelper
+                  .formatTagResponse(tagInstances);
+                res.status(201).json({ article: articleResponse });
+              });
+          });
+      }).catch(next);
   }
 
   /**
@@ -52,15 +69,22 @@ class ArticleController {
   static getArticle(req, res, next) {
     Article.find({
       where: { slug: req.params.slug },
-      include: articleControllerHelper
-        .includeAuthor(User),
+      include: [
+        articleControllerHelper.includeAuthor(User, req.filterByAuthor),
+        articleControllerHelper.includeTag(Tag, req.filterByTag),
+      ],
       attributes: articleControllerHelper
         .articleAttributes(),
     }).then((article) => {
       if (!article) {
         errorHelper.throwError('Article not found', 404);
       }
-      return res.status(200).json({ article });
+      const articleObj = article.dataValues;
+      articleObj.tags = articleControllerHelper
+        .formatTagResponse(article.tags);
+      return res.status(200).json({
+        article: articleObj,
+      });
     }).catch(next);
   }
 
@@ -79,18 +103,33 @@ class ArticleController {
     page = +page > 0 ? +page : 1;
     const offset = limit * (page - 1);
     Article.findAndCountAll({
+      distinct: 'id',
       limit,
       offset,
-      include: articleControllerHelper
-        .includeAuthor(User, req.filterByAuthorAttributes),
-      attributes: articleControllerHelper
-        .articleAttributes(),
       order: [['createdAt', 'DESC']],
       where: req.filterByArticleAttributes,
-    }).then(articles => res.status(200).json({
-      articles: articles.rows,
-      articlesCount: articles.count,
-    })).catch(next);
+      include: [
+        articleControllerHelper
+          .includeAuthor(User, req.filterByAuthorAttributes),
+        articleControllerHelper
+          .includeTag(Tag, req.filterByTag),
+      ],
+      attributes: articleControllerHelper
+        .articleAttributes(true),
+    }).then((articles) => {
+      const finalArticleResponseObj = articles
+        .rows.map(({ dataValues }) => {
+          const articleObj = dataValues;
+          articleObj.tags = articleControllerHelper
+            .formatTagResponse(articleObj.tags);
+          return articleObj;
+        });
+      return res.status(200).json({
+        articles: finalArticleResponseObj,
+        articlesCount: articles.count,
+      });
+    })
+      .catch(next);
   }
 
   /**

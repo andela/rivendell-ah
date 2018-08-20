@@ -10,6 +10,7 @@ export default (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
       required: true,
+      unique: true,
     },
     title: {
       type: DataTypes.TEXT,
@@ -35,8 +36,6 @@ export default (sequelize, DataTypes) => {
   Article.associate = (models) => {
     Article.belongsTo(models.User, {
       foreignKey: 'authorId',
-      onDelete: 'CASCADE',
-      onUpdate: 'CASCADE',
       as: 'author',
     });
     Article.hasMany(models.ArticleLike, {
@@ -54,6 +53,11 @@ export default (sequelize, DataTypes) => {
       foreignKey: 'articleId',
       onDelete: 'CASCADE',
       as: 'ratings',
+    });
+    Article.belongsToMany(models.Tag, {
+      as: 'tags',
+      through: 'ArticleTags',
+      foreignKey: 'articleId',
     });
   };
   return Article;

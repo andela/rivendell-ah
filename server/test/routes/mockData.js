@@ -1,4 +1,3 @@
-/* eslint-disable */
 
 const mockData = {
   user1: {
@@ -32,9 +31,10 @@ const mockData = {
     lastName: 'Badwolf',
     username: 'badwolf',
     email: 'bigbadwolf@gmail.com',
-    password: 'Bigbadw0lf!'
+    password: 'Bigbadw0lf!',
   },
   user7: {
+    id: 3,
     firstName: 'Strawhat',
     lastName: 'Luffy',
     username: 'strawhat',
@@ -92,14 +92,14 @@ const mockData = {
     lastName: 'Lee',
     username: 'fattylee',
     bio: null,
-    image: null
+    image: null,
   },
   followingProfile: {
     firstName: 'Zebedee',
     lastName: 'Macus',
     username: 'zebedee',
     bio: null,
-    image: null
+    image: null,
   },
   megameUser1: {
     firstName: 'Charlie',
@@ -126,7 +126,31 @@ const mockData = {
     slug: 'article-1-1',
     image: null,
     authorId: 1,
-  }
+  },
+  authorTag: {
+    firstName: 'Tager',
+    lastName: 'Author',
+    username: 'authorTager',
+    hash: 'R!vend1elLl121//',
+    verified: true,
+    email: 'authortager@gmail.com',
+  },
+  article1: {
+    title: 'My greatest love',
+    description: 'love',
+    body: 'I love my mother very muc',
+
+  },
+
+  tags1: ['life', 'death', 'music'],
+  tags2: [
+    'sorrow', 'blood', 'education', 'life', 'death', 'no', 'way',
+    'sorrw', 'blod', 'educatin', 'lif', 'deah', 'n', 'wa',
+    'lfe', 'eath', 'msic', 'ife', 'deth', 'musc',
+    'sorrow1', 'blood2', 'education3', 'life4', 'death5', 'no6', 'way7',
+    'sorrw3', 'blod3', 'educa3tin', 'li3f', '89', 'n1', 'wa1',
+    'lf3e', '3eath', 'msic3', '1fe', '6eth', '9usc',
+  ],
 };
 
 export default mockData;

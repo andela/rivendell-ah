@@ -7,12 +7,14 @@ import ratingMiddleware from '../../utils/middleware/ratingMiddleware';
 import articleFilters from '../../utils/middleware/articleFilters';
 
 import LikeController from '../../controllers/LikeController';
+import filterTag from '../../utils/middleware/filterTag';
 
 const router = Router();
 router.post(
   '/articles',
   auth.authenticateUser, auth.verifyUser,
   validate.createArticle,
+  filterTag,
   ArticleController.createArticle,
 );
 

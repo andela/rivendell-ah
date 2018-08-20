@@ -53,7 +53,7 @@ describe('Testing likes routes /api/auth/:slug/like', () => {
   });
 
 
-  describe('if the user has not yet been verified', () => {
+  describe('if the user has not yet been verified tries to like an article', () => {
     it('should return a 403(Unauthorized)', (done) => {
       request(server)
         .get(likeRoute)
