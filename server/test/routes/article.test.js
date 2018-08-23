@@ -4,23 +4,35 @@ import chaiHttp from 'chai-http'
 import server from '../../index';
 import tokenService from '../../utils/services/tokenService';
 import mockData from './mockData';
+import models from '../../database/models';
+const { User } = models;
 
-const testUser = mockData.user7; 
+const mockTestUser = mockData.user7;
 
 const { expect } = chai;
 const baseUrl = '/api/articles/';
 const SIGN_UP_ROUTE = '/api/users';
 chai.use(chaiHttp);
 let slug;
+let token;
 
 describe('Testing articles routes', () => {
-  let token = tokenService.generateToken(testUser, '3d');
+  before((done) => {
+    User.findOne({ where: { email: mockTestUser.email } })
+      .then((user) => {
+        token = tokenService.generateToken({
+          id: user.dataValues.id,
+          email: user.dataValues.email,
+        }, '3d') 
+        done();
+      });
+  });
   describe('Creating an Article', () => {
     it('Should create an Article sucessfully with title, description and body specified', (done) => {
       chai.request(server)
         .post(`${baseUrl}`)
         .send({
-          article:{
+          article: {
             title: 'A new title',
             description: 'A new description',
             body: 'A new body'
@@ -40,7 +52,7 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .post(`${baseUrl}`)
         .send({
-          article:{
+          article: {
             title: 1234,
             description: 1234,
             body: 12234
@@ -62,7 +74,7 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .post(`${baseUrl}`)
         .send({
-          article:{
+          article: {
             title: '',
             description: '',
             body: ''
@@ -82,7 +94,7 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .post(`${baseUrl}`)
         .send({
-          article:{
+          article: {
             title: '',
             description: 'A description',
             body: 'A body'
@@ -101,7 +113,7 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .post(`${baseUrl}`)
         .send({
-          article:{
+          article: {
             title: 'A title',
             description: '',
             body: 'A body'
@@ -121,7 +133,7 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .post(`${baseUrl}`)
         .send({
-          article:{
+          article: {
             title: 'A title',
             description: 'A description',
             body: ''
@@ -172,12 +184,52 @@ describe('Testing articles routes', () => {
     })
   })
 
+  describe('Getting all Articles with pagination having limit=1 and page=1', () => {
+    it('Should return one article in the first page', (done) => {
+      chai.request(server)
+        .get(`${baseUrl}?limit=1&page=1`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('articles');
+          expect(res.body.articles.length).to.be.gte(1);
+          expect(res.body).to.have.property('articlesCount');
+          done();
+        });
+    })
+  })
+  describe('Getting all Articles with pagination having invalid limit and page', () => {
+    it('Should return the default limit of 20 or the total no of articles if < 20 in default page 1', (done) => {
+      chai.request(server)
+        .get(`${baseUrl}?limit=veqvgef&page=eeffeq`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('articles');
+          expect(res.body.articles.length).to.be.gte(1);
+          expect(res.body).to.have.property('articlesCount');
+          done();
+        });
+    })
+  })
+  describe('Getting all Articles with pagination having invalid limit and page', () => {
+    it('Should return the default limit of 20 or the total no of articles if < 20 in default page 1', (done) => {
+      chai.request(server)
+        .get(`${baseUrl}?limit=-2&page=-1`)
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('articles');
+          expect(res.body.articles.length).to.be.gte(1);
+          expect(res.body).to.have.property('articlesCount');
+          done();
+        });
+    })
+  })
+
   describe('Updating an Article', () => {
     it('Should sucessfully update an Article', (done) => {
       chai.request(server)
         .put(`${baseUrl}${slug}`)
         .send({
-          article:{
+          article: {
             title: 'A updated title',
             description: 'A updated description',
             body: 'A updated body'
@@ -196,7 +248,7 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .put(`${baseUrl}${slug}`)
         .send({
-          article:{
+          article: {
             title: 'An updated title',
             description: 'An updated description',
           }
@@ -214,9 +266,9 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .put(`${baseUrl}${slug}`)
         .send({
-          article:{
+          article: {
             title: 'An updated title',
-            body:'A new body update',
+            body: 'A new body update',
           }
         })
         .set('Authorization', token)
@@ -232,9 +284,9 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .put(`${baseUrl}${slug}`)
         .send({
-          article:{
+          article: {
             description: 'An updated description',
-            body:'A new body update',
+            body: 'A new body update',
           }
         })
         .set('Authorization', token)
@@ -250,7 +302,7 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .put(`${baseUrl}${slug}`)
         .send({
-          article:{
+          article: {
             title: '',
             description: '',
             body: ''
@@ -286,7 +338,7 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .put(`${baseUrl}${slug}`)
         .send({
-          article:{
+          article: {
             title: 1234,
             description: 1234,
             body: 12234
@@ -307,7 +359,7 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .put(`${baseUrl}Wrong-slug`)
         .send({
-          article:{
+          article: {
             title: 'A title',
             description: 'A description',
             body: 'A body'
@@ -355,4 +407,4 @@ describe('Testing articles routes', () => {
         });
     })
   })
-})
+});

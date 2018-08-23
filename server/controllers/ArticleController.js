@@ -93,7 +93,14 @@ class ArticleController {
    * @returns {Object} the response body
    */
   static getAllArticle(req, res, next) {
+    let { limit, page } = req.query;
+    limit = +limit < 20 && +limit > 0 ? +limit : 20;
+    page = +page > 0 ? +page : 1;
+    const offset = limit * (page - 1);
+
     Article.findAndCountAll({
+      limit,
+      offset,
       include: [{
         model: User,
         as: 'author',
