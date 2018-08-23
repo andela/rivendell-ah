@@ -7,7 +7,6 @@ import { internet, name } from 'faker';
 import chaiHttp from 'chai-http';
 import server from '../../index';
 
-
 const SIGN_UP_ROUTE = '/api/users';
 const LOGIN_ROUTE = '/api/users/login';
 use(chaiHttp);
@@ -22,6 +21,7 @@ const tempUser = {
     password: '11qQw@123',
   },
 };
+
 describe('user test', () => {
   describe('user on signing up', () => {
     describe('signing up with no username', () => {

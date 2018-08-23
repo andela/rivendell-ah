@@ -6,6 +6,7 @@ import chaiHttp from 'chai-http';
 import server from '../../index';
 
 use(chaiHttp);
+
 describe('Social Login', () => {
   describe('when user tries to login with facebook', () => {
     it(`should redirect the user to facebook website and return 200`, (done) => {

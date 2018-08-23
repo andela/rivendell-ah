@@ -389,4 +389,4 @@ describe('Test for follow/unfollow endpoints', () => {
         });
     });
   });
-})
+});
