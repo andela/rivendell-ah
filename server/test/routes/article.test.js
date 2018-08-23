@@ -28,7 +28,7 @@ describe('Testing articles routes', () => {
       });
   });
   describe('Creating an Article', () => {
-    it('Should create an Article sucessfully with title, description and body specified', (done) => {
+    it('Should create an Article successfully with title, description and body specified', (done) => {
       chai.request(server)
         .post(`${baseUrl}`)
         .send({
@@ -396,15 +396,4 @@ describe('Testing articles routes', () => {
         });
     })
   })
-  describe('Getting Articles from an empty articles table', () => {
-    it('Should 404(Bad request) error', (done) => {
-      chai.request(server)
-        .get(`${baseUrl}`)
-        .end((err, res) => {
-          expect(res.status).to.equal(404);
-          expect(res.body).to.have.property('message').equal('No Articles found');
-          done();
-        });
-    })
-  })
-});
+})

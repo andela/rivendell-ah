@@ -66,7 +66,7 @@ if (!isProduction) {
     return res.status(err.status || 500)
       .json({
         errors: {
-          message: err.message.split(','),
+          message: err.message,
           error: err,
         },
       });

@@ -159,8 +159,7 @@ describe('Testing user routes', () => {
           expect(res.status).to.equal(404);
           expect(res.body).to.haveOwnProperty('errors')
             .to.haveOwnProperty('message')
-            .to.be.an('array');
-          expect(res.body.errors.message[0]).to.equal('User not found in the database');
+            .to.equal('User not found in the database');
           done();
         });
     });

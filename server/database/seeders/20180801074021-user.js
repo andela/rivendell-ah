@@ -11,7 +11,8 @@ module.exports = {
       verified: false,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }, {
+    },
+    {
       firstName: 'Strawhat',
       lastName: 'Luffy',
       username: 'strawhat',
@@ -20,7 +21,8 @@ module.exports = {
       verified: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }, {
+    },
+    {
       firstName: 'Naruto',
       lastName: 'Uzumaki',
       username: 'naruto',
@@ -29,7 +31,38 @@ module.exports = {
       verified: false,
       createdAt: new Date(),
       updatedAt: new Date()
-    },{
+    },
+    {
+      firstName: 'Charlie',
+      lastName: 'Brown',
+      username: 'charlieBrown',
+      email: 'charlieBrown@gmail.com',
+      hash: '12345',
+      verified: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      firstName: 'Charlie1',
+      lastName: 'Brown1',
+      username: 'charlieBrown1',
+      email: 'charlieBrown1@gmail.com',
+      hash: '12345',
+      verified: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
+      firstName: 'Mary',
+      lastName: 'Jane',
+      username: 'maryJane',
+      email: 'maryJane@gmail.com',
+      hash: '12345',
+      verified: false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
+    {
       firstName: 'Fatty',
       lastName: 'Lee',
       username: 'fattylee',
