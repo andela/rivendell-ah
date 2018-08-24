@@ -5,6 +5,7 @@
  * @returns {Object} parsed user object
  */
 const userDetails = (user, token) => ({
+  id: user.id,
   firstName: user.firstName,
   lastName: user.lastName,
   email: user.email,

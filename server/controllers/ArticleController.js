@@ -1,10 +1,16 @@
 import slugCreate from 'slug';
 import uuid from 'uuid/v1';
+import Sequelize from 'sequelize';
 import models from '../database/models';
 import articleControllerHelper from '../utils/helpers/articleControllerHelper';
 import errorHelper from '../utils/helpers/errorHelper';
 
-const { Article, User, Tag } = models;
+const {
+  Article,
+  User,
+  Tag,
+  Follow,
+} = models;
 
 /**
  *
@@ -183,6 +189,49 @@ class ArticleController {
         }
         return res.status(200).json();
       }).catch(next);
+  }
+
+  /**
+   * this controller handle request for user to get
+   * users feed
+   * @param {Object} req the request body
+   * @param {Object} res the response body
+   * @param {Object} next call the next middle
+   * @returns {Array} an array of articles for users
+   * the user is following order by the latest
+   * article that was created
+   */
+  static getUserFeed(req, res, next) {
+    let { limit } = req.query;
+    const { id: userId } = req.user;
+    limit = parseInt(limit, 10);
+    Follow
+      .findAll({
+        where: {
+          followerId: userId,
+        },
+        attributes: ['followingId'],
+      })
+      .then((followingArray) => {
+        if (followingArray.length === 0) {
+          return res.status(200).json({ feed: [] });
+        }
+
+        // get an array of userId the user is following
+        const followings = [];
+        followingArray.map(following => followings.push(following.followingId));
+
+        // user sequelize option operators 'or'
+        const { or } = Sequelize.Op;
+        return Article
+          .findAll({
+            where: { [or]: [{ authorId: followings }] },
+            order: [['createdAt', 'DESC']],
+            limit: limit || 10,
+          })
+          .then(allArticle => res.status(200).json({ feed: allArticle }));
+      })
+      .catch(next);
   }
 }
 
