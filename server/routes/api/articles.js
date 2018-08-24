@@ -22,6 +22,7 @@ router.get(
   '/articles/:slug',
   ArticleController.getArticle,
 );
+
 router.get(
   '/articles', articleFilters,
   ArticleController.getAllArticle,

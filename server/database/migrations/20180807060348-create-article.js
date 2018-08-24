@@ -42,6 +42,15 @@ module.exports = {
           as: 'userId',
         },
       },
+      subcategoryId: {
+        type: Sequelize.INTEGER,
+        onDelete: 'CASCADE',
+        references: {
+          model: 'Subcategories',
+          key: 'id',
+          as: 'subcategoryId',
+        },
+      },
     });
   },
   down: (queryInterface, Sequelize) => {

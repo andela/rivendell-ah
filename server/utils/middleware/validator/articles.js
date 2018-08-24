@@ -1,5 +1,7 @@
 import validator from '../../helpers/validatorHelper';
 import errorHelper from '../../helpers/errorHelper';
+import checkSubcategory from '../../helpers/checkSubcategoryHelper';
+
 
 /**
  * Function validates user inputs when creating an article
@@ -18,6 +20,7 @@ const createArticle = (req, res, next) => {
     title: req.body.article.title,
     description: req.body.article.description,
     body: req.body.article.body,
+    subcategory: req.body.article.subcategory,
   };
   // Validation of user Inputs
   const validation = validator.createArticleRules(articleInput);
@@ -26,7 +29,9 @@ const createArticle = (req, res, next) => {
       errors: validation,
     });
   }
-  return next();
+
+  // Check if subcategory exists in the database
+  return checkSubcategory(req, res, next);
 };
 
 const updateArticle = (req, res, next) => {
@@ -39,6 +44,7 @@ const updateArticle = (req, res, next) => {
     title: req.body.article.title,
     description: req.body.article.description,
     body: req.body.article.body,
+    subcategory: req.body.article.subcategory,
   };
     // Validation of user Inputs
   const validation = validator.updateArticleRules(articleInput);
@@ -47,7 +53,9 @@ const updateArticle = (req, res, next) => {
       errors: validation,
     });
   }
-  return next();
+
+  // Check if subcategory exists in the database
+  return checkSubcategory(req, res, next);
 };
 
 export default {
