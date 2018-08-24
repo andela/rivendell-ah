@@ -4,6 +4,7 @@ import validate from '../../utils/middleware/validator/articles';
 import ArticleController from '../../controllers/ArticleController';
 import RatingController from '../../controllers/RatingController';
 import ratingMiddleware from '../../utils/middleware/ratingMiddleware';
+import articleFilters from '../../utils/middleware/articleFilters';
 
 import LikeController from '../../controllers/LikeController';
 
@@ -20,7 +21,7 @@ router.get(
   ArticleController.getArticle,
 );
 router.get(
-  '/articles',
+  '/articles', articleFilters,
   ArticleController.getAllArticle,
 );
 
