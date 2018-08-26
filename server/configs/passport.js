@@ -19,18 +19,14 @@ passport.use(
         .findOne({ where: { email } })
         .then((user) => {
           if (!user) {
-            return done(null, false, {
-              errors: { email: 'is invalid' },
-            });
+            return done(null, false);
           }
 
           const hash = crypto
             .pbkdf2Sync(password, user.salt, 10000, 512, 'sha512')
             .toString('hex');
           if (!(hash === user.hash)) {
-            return done(null, false, {
-              errors: { password: 'is invalid' },
-            });
+            return done(null, false);
           }
           return done(null, user);
         })

@@ -41,6 +41,25 @@ const mockData = {
     email: 'strawhat@gmail.com',
     password: 'Bigbadw0lf!',
   },
+
+  user8: {
+    firstName: 'NewFirstName',
+    lastName: 'NewLastName',
+    username: 'usernameIsHere',
+    email: 'newemail@gmail.com',
+    password: 'Bigbadw0lf!',
+    bio: 'newBio',
+    image: 'http://thisisaurl/image.png',
+  },
+  existingUser: {
+    firstName: 'thisUserFirstName',
+    lastName: 'thisUserLastName',
+    username: 'thisuserexists',
+    email: 'thisuserexists@gmail.com',
+    hash: 'BigbGadw0lf!',
+    password: 'BigbGadw0lf!',
+    bio: 'whatabio',
+  },
   likeUser: {
     firstName: 'Chidiebere',
     lastName: 'TheGreat',
@@ -192,7 +211,7 @@ const mockData = {
     body: 'article notification',
     slug: 'article-notification',
     authorId: 'fbf941c0-aa8c-11e8-a375-d331f0a71356',
-  }
+  },
 };
 
 export default mockData;

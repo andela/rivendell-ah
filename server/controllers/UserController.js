@@ -68,8 +68,9 @@ class UserController {
   static login(req, res, next) {
     return passport.authenticate(
       'local', { session: false },
-      (err, user, info) => {
+      (err, user) => {
         if (err) return next(err);
+
         if (user) {
           const payload = {
             id: user.id,
@@ -81,30 +82,12 @@ class UserController {
             user: userControllerHelper.userDetails(user, token),
           });
         }
-        return res.status(422)
-          .json(info);
+        return errorHelper
+          .throwError('email and password combination not found', 400);
       },
     )(req, res, next);
   }
 
-  /**
-   * Get the details of a logged in user
-   * @param {Object} req the request body
-   * @param {Object} res the response body
-   * @param {function} next a call to the next function
-   * @returns {Object} the response body
-   */
-  static get(req, res, next) {
-    const { id } = req.body.decoded;
-    User.findById(id)
-      .then((user) => {
-        if (!user) {
-          errorHelper.decoded('User not found', 404);
-        }
-        return res
-          .json({ user: userControllerHelper.userDetails(user) });
-      }).catch(next);
-  }
 
   /**
    * Method updates an existing user information in the database.

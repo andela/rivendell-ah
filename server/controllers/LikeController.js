@@ -101,7 +101,7 @@ class LikeController {
    * sent to the server
    * @param {object} res used to send a response back to the
    * client
-   * @param {object} next called when an error occurs while
+   * @param {object} next called  when an error occurs while
    * querying the database
    * @returns {void} does not return a value to the user
    */
