@@ -79,7 +79,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('Authentication failed');
+            .to.equal('Authentication failed');
           done();
         });
     })
@@ -91,7 +91,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('Your account has not been verified');
+            .to.equal('Your account has not been verified');
           done();
         });
     })
@@ -103,7 +103,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('User not found');
+            .to.equal('User not found');
           done();
         });
     });
@@ -127,7 +127,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(422);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('You are already following this User');
+            .to.equals('You are already following this User');
           done();
         });
     })
@@ -139,7 +139,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(422);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('You cannot follow yourself');
+            .to.equals('You cannot follow yourself');
           done();
         });
     })
@@ -154,7 +154,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('Authentication failed');
+            .to.equal('Authentication failed');
           done();
         });
     })
@@ -166,7 +166,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('Your account has not been verified');
+            .to.equal('Your account has not been verified');
           done();
         });
     })
@@ -178,7 +178,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('User not found');
+            .to.equal('User not found');
           done();
         });
     });
@@ -202,7 +202,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('You are not following this author');
+            .to.equal('You are not following this author');
           done();
         });
     })
@@ -216,7 +216,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('User not found');
+            .to.equal('User not found');
           done();
         });
     });
@@ -228,7 +228,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('Your account has not been verified');
+            .to.equal('Your account has not been verified');
           done();
         });
     })
@@ -240,22 +240,10 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('Authentication failed');
+            .to.equal('Authentication failed');
           done();
         });
     })
-    it('should return error message with status 404 if no follower is found', (done) => {
-      chai.request(server)
-        .get(`/api/profiles/${follow8Id}/followers`)
-        .set('Authorization', follow8Token)
-        .end((err, res) => {
-          expect(res.status).to.equal(404);
-          expect(res.body).to.have.property('errors')
-            .which.to.have.property('message')
-            .that.is.equals('This user does not have any follower');
-          done();
-        });
-    });
     it('should return an array of users profile that are following an author', (done) => {
       chai.request(server)
         .get(`/api/profiles/${author3Id}/followers`)
@@ -273,10 +261,10 @@ describe('Test for follow/unfollow endpoints', () => {
         .get(`/api/followers`)
         .set('Authorization', follow8Token)
         .end((err, res) => {
-          expect(res.status).to.equal(404);
-          expect(res.body).to.have.property('errors')
-            .which.to.have.property('message')
-            .that.is.equals('You don\'t have any follower');
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('followers')
+            .which.is.an('Array')
+            expect(res.body.followers.length).to.equal(0);
           done();
         });
     });
@@ -312,7 +300,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(401);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('Authentication failed');
+            .to.equal('Authentication failed');
           done();
         });
     })
@@ -324,7 +312,7 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(404);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('User not found');
+            .to.equal('User not found');
           done();
         });
     });
@@ -336,31 +324,19 @@ describe('Test for follow/unfollow endpoints', () => {
           expect(res.status).to.equal(403);
           expect(res.body).to.have.property('errors')
             .which.to.have.property('message')
-            .that.is.equals('Your account has not been verified');
+            .to.equal('Your account has not been verified');
           done();
         });
     })
-    it('should return error message with status 404 if you are not following anyone', (done) => {
-      chai.request(server)
-        .get(`/api/profiles/${follow8Id}/followings`)
-        .set('Authorization', follow8Token)
-        .end((err, res) => {
-          expect(res.status).to.equal(404);
-          expect(res.body).to.have.property('errors')
-            .which.to.have.property('message')
-            .that.is.equals('This user is not following anyone');
-          done();
-        });
-    });
-    it('should return error message with status 404 if you are not following anyone', (done) => {
+    it('should return an empty array if you are not following anyone', (done) => {
       chai.request(server)
         .get(`/api/followings`)
         .set('Authorization', follow8Token)
         .end((err, res) => {
-          expect(res.status).to.equal(404);
-          expect(res.body).to.have.property('errors')
-            .which.to.have.property('message')
-            .that.is.equals('You are not following anyone');
+          expect(res.status).to.equal(200);
+          expect(res.body).to.have.property('followings')
+            .which.is.an('Array')
+          expect(res.body.followings.length).to.equal(0);
           done();
         });
     });

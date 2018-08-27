@@ -1,5 +1,3 @@
-
-
 export default {
   /**
      *This etracts the UUID in a slug. Note that this functions assumes that

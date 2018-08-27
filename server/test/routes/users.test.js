@@ -56,8 +56,7 @@ describe('Testing user routes', () => {
         .end((err, res) => {
           expect(res.status).to.equal(201);
           expect(res.body).to.haveOwnProperty('message')
-            .to.equal(`Sign up successful, visit your email 
-          to verify your account.`);
+            .to.equal('Sign up successful, visit your email to verify your account.');
           done();
         });
     });
@@ -191,15 +190,14 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body).to.have.property('status').equal('fail');
-          expect(res.body.error.username[0]).to.equal('Please enter a username in the specified field');
-          expect(res.body.error.username.length).to.equal(1);
-          expect(res.body.error.email[0]).to.equal( 'Please enter an email in the specified field');
-          expect(res.body.error.email.length).to.equal(1);
-          expect(res.body.error.password[0]).to.equal('Please enter a password in the specified field');
-          expect(res.body.error.password.length).to.equal(1);
-          expect(res.body.error.firstName[0]).to.equal('Please enter your first name in the specified field');
-          expect(res.body.error.lastName[0]).to.equal('Please enter your last name in the specified field');
+          expect(res.body.errors.username[0]).to.equal('Please enter a username in the specified field');
+          expect(res.body.errors.username.length).to.equal(1);
+          expect(res.body.errors.email[0]).to.equal( 'Please enter an email in the specified field');
+          expect(res.body.errors.email.length).to.equal(1);
+          expect(res.body.errors.password[0]).to.equal('Please enter a password in the specified field');
+          expect(res.body.errors.password.length).to.equal(1);
+          expect(res.body.errors.firstName[0]).to.equal('Please enter your first name in the specified field');
+          expect(res.body.errors.lastName[0]).to.equal('Please enter your last name in the specified field');
           done();
         });
     });
@@ -219,10 +217,38 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body).to.haveOwnProperty('error')
+          expect(res.body).to.haveOwnProperty('errors')
             .to.haveOwnProperty('firstName')
             .to.be.an('array');
-          expect(res.body.error.firstName[0]).to.equal('first name entered should have minimum of 2 characters');
+          expect(res.body.errors.firstName[0]).to.equal('first name entered should have minimum of 2 characters');
+          done();
+        });
+    });
+  });
+
+  describe('Registering with no input', () => {
+    it('Should return error 400', (done) => {
+      chai.request(server)
+        .post('/api/users')
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.haveOwnProperty('message')
+            .to.equal('Please provide the required fields');
+          done();
+        });
+    });
+  });
+
+  describe('Logging in with no input', () => {
+    it('Should return error 400', (done) => {
+      chai.request(server)
+        .post('/api/users/login')
+        .end((err, res) => {
+          expect(res.status).to.equal(400);
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.haveOwnProperty('message')
+            .to.equal('Please provide the required fields');
           done();
         });
     });
@@ -243,10 +269,10 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body).to.haveOwnProperty('error')
+          expect(res.body).to.haveOwnProperty('errors')
             .to.haveOwnProperty('lastName')
             .to.be.an('array');
-          expect(res.body.error.lastName[0]).to.equal('last name entered should have minimum of 2 characters');
+          expect(res.body.errors.lastName[0]).to.equal('last name entered should have minimum of 2 characters');
           done();
         });
     });
@@ -265,9 +291,8 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body).to.have.property('status').equal('fail');
-          expect(res.body.error.email[0]).to.equal('Please enter a valid email');
-          expect(res.body.error.email.length).to.equal(1);
+          expect(res.body.errors.email[0]).to.equal('Please enter a valid email');
+          expect(res.body.errors.email.length).to.equal(1);
           done();
         });
     });
@@ -286,10 +311,10 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.error.password[0]).to.equal(
+          expect(res.body.errors.password[0]).to.equal(
             'Your password must include an uppercase and lowercase alphabet, a number and a special character');
-          expect(res.body.error.password[1]).to.equal('Password entered should have minimum of 8 characters');
-          expect(res.body.error.password.length).to.equal(2);
+          expect(res.body.errors.password[1]).to.equal('Password entered should have minimum of 8 characters');
+          expect(res.body.errors.password.length).to.equal(2);
           done();
         });
     });
@@ -309,10 +334,10 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.error.password[0]).to.equal(
+          expect(res.body.errors.password[0]).to.equal(
             'Your password must include an uppercase and lowercase alphabet, a number and a special character');
-          expect(res.body.error.password[1]).to.equal('Password entered should have maximum of 100 characters');
-          expect(res.body.error.password.length).to.equal(2);
+          expect(res.body.errors.password[1]).to.equal('Password entered should have maximum of 100 characters');
+          expect(res.body.errors.password.length).to.equal(2);
           done();
         });
     });
@@ -333,8 +358,8 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body).to.have.property('status').equal('fail');
-          expect(res.body.error).to.equal('Email entered already exists');
+          expect(res.body.errors).to.haveOwnProperty('message')
+            .to.equal('Email entered already exists');
           done();
         });
     });
@@ -355,8 +380,8 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body).to.have.property('status').equal('fail');
-          expect(res.body.error).to.equal('Username entered already exists');
+          expect(res.body.errors).to.haveOwnProperty('message')
+            .to.equal('Username entered already exists');
           done();
         });
     });
@@ -377,8 +402,8 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body).to.have.property('status').equal('fail');
-          expect(res.body.error).to.equal('Email and Username entered already exists');
+          expect(res.body.errors).to.haveOwnProperty('message')
+            .to.equal('Email and Username entered already exists');
           done();
         });
     });
@@ -411,9 +436,8 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body).to.have.property('status').equal('fail');
-          expect(res.body.error.email[0]).to.equal( 'Please enter an email in the specified field');
-          expect(res.body.error.email.length).to.equal(1);
+          expect(res.body.errors.email[0]).to.equal( 'Please enter an email in the specified field');
+          expect(res.body.errors.email.length).to.equal(1);
           done();
         });
     });
@@ -427,8 +451,7 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body).to.have.property('status').equal('fail');
-          expect(res.body.error.email[0]).to.equal('Please enter a valid email');
+          expect(res.body.errors.email[0]).to.equal('Please enter a valid email');
           done();
         });
     });
@@ -445,7 +468,7 @@ describe('Testing user routes', () => {
           expect(res.status).to.equal(404);
           expect(res.body).to.haveOwnProperty('errors')
             .to.haveOwnProperty('message')
-            .to.equal('User not found!');
+            .to.equal('User not found');
           done();
         });
     });
@@ -560,9 +583,8 @@ describe('Testing user routes', () => {
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body).to.have.property('status').equal('fail');
-          expect(res.body.error.password[0]).to.equal('Please enter a password in the specified field');
-          expect(res.body.error.password.length).to.equal(1);
+          expect(res.body.errors.password[0]).to.equal('Please enter a password in the specified field');
+          expect(res.body.errors.password.length).to.equal(1);
           done();
         });
     });
@@ -629,7 +651,7 @@ describe('Testing user routes', () => {
           }
         })
         .end((err, res) => {
-          expect(res.status).to.equal(400);
+          expect(res.status).to.equal(404);
           expect(res.body).to.haveOwnProperty('errors')
             .to.haveOwnProperty('message')
             .to.equal('User not found');
@@ -657,20 +679,6 @@ describe('Testing user routes', () => {
           expect(res.body).to.haveOwnProperty('profile')
             .to.haveOwnProperty('username')
             .to.equal(mockData.user1.username);
-          done();
-        });
-    });
-    it('Should return the profile of the current user with owner field set to true', (done) =>{
-      chai.request(server)
-        .get(`/api/profiles/${mockData.user6.username}`)
-        .set({ authorization: user6Token })
-        .end((err, res) => {
-          expect(res.status).to.equal(200);
-          expect(res.body).to.haveOwnProperty('profile')
-            .to.haveOwnProperty('username')
-            .to.equal(mockData.user6.username);
-          expect(res.body.profile).to.haveOwnProperty('owner')
-            .to.equal(true);
           done();
         });
     });
@@ -825,6 +833,72 @@ describe('Testing user routes', () => {
           done();
         });
     });
+    it('Should let the user update his/her profile, if the provided update passes all checks and validations', (done) => {
+      chai.request(server)
+        .put('/api/user')
+        .send({
+          user: {
+            password: 'P@ssword12'
+          }
+        })
+        .set({ authorization: user6Token })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.haveOwnProperty('user')
+          done();
+        });
+    });
+    it('Should let the user update his/her profile, if the provided update passes all checks and validations', (done) => {
+      chai.request(server)
+        .put('/api/user')
+        .send({
+          user: {
+            image: 'image-link'
+          }
+        })
+        .set({ authorization: user6Token })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.haveOwnProperty('user')
+            .to.haveOwnProperty('image')
+            .to.equal('image-link');
+          done();
+        });
+    });
+    it('Should let the user update his/her profile, if the provided update passes all checks and validations', (done) => {
+      chai.request(server)
+        .put('/api/user')
+        .send({
+          user: {
+            lastName: 'lastName-update'
+          }
+        })
+        .set({ authorization: user6Token })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.haveOwnProperty('user')
+            .to.haveOwnProperty('lastName')
+            .to.equal('lastName-update');
+          done();
+        });
+    });
+    it('Should let the user update his/her profile, if the provided update passes all checks and validations', (done) => {
+      chai.request(server)
+        .put('/api/user')
+        .send({
+          user: {
+            firstName: 'firstName-update'
+          }
+        })
+        .set({ authorization: user6Token })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.haveOwnProperty('user')
+            .to.haveOwnProperty('firstName')
+            .to.equal('firstName-update');
+          done();
+        });
+    });
     it('Should return an error 400 if no update was provided', (done) => {
       chai.request(server)
         .put('/api/user')
@@ -842,7 +916,7 @@ describe('Testing user routes', () => {
   describe('Making a GET request to \'/profiles\'', () => {
     it('Should return an array of profiles(objects) matching the query strings', (done) => {
       chai.request(server)
-        .get('/api/profiles?search=strawhat&limit=10&offset=0')
+        .get('/api/profiles?search=strawhat&limit=10&page=1')
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.be.an('array')

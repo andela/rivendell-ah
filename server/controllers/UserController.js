@@ -5,6 +5,8 @@ import verificationHelper from '../utils/helpers/verificationHelper';
 import emailService from '../utils/services/emailService';
 import hashPassword from '../utils/services/passwordHashService';
 import emailTemplates from '../utils/services/emailTemplates';
+import errorHelper from '../utils/helpers/errorHelper';
+import userControllerHelper from '../utils/helpers/userControllerHelper';
 
 const { User } = models;
 
@@ -32,10 +34,9 @@ class UserController {
     } = req.body.user;
     User.create({
       firstName, lastName, username, email, hash,
-    })
+    }).then(user => (
       // return the user and a promise call to send the verification email
-      .then(user => (
-        { sendMail: verificationHelper.sendVerificationEmail(user), user }))
+      { sendMail: verificationHelper.sendVerificationEmail(user), user }))
       .then(({ user }) => {
         const payload = {
           id: user.id,
@@ -43,23 +44,12 @@ class UserController {
           email: user.email,
         };
         const token = tokenService.generateToken(payload, '3d');
-
         res.status(201).json({
-          user: {
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            username: user.username,
-            image: user.image,
-            bio: user.bio,
-            verified: user.verified,
-            token,
-          },
-          message: `Sign up successful, visit your email 
-          to verify your account.`,
+          user: userControllerHelper.userDetails(user, token),
+          message: 'Sign up successful, visit your email '
+            + 'to verify your account.',
         });
-      })
-      .catch(next);
+      }).catch(next);
   }
 
   /**
@@ -73,43 +63,19 @@ class UserController {
    * @returns {Object} the response body
    */
   static login(req, res, next) {
-    if (!req.body.user) {
-      return res.status(422).json({ errors: { user: 'must be an object' } });
-    }
-
-    if (!req.body.user.email) {
-      return res.status(422).json({ errors: { email: 'can\'t be blank' } });
-    }
-
-    if (!req.body.user.password) {
-      return res.status(422).json({ errors: { password: 'can\'t be blank' } });
-    }
     return passport.authenticate(
       'local', { session: false },
       (err, user, info) => {
-        if (err) {
-          return next(err);
-        }
-
+        if (err) return next(err);
         if (user) {
           const payload = {
             id: user.id,
             username: user.username,
             email: user.email,
           };
-
           const token = tokenService.generateToken(payload, '3d');
           return res.status(200).json({
-            user: {
-              firstName: user.firstName,
-              lastName: user.lastName,
-              email: user.email,
-              username: user.username,
-              image: user.image,
-              bio: user.bio,
-              verified: user.verified,
-              token,
-            },
+            user: userControllerHelper.userDetails(user, token),
           });
         }
         return res.status(422)
@@ -119,23 +85,22 @@ class UserController {
   }
 
   /**
-   * Method finds a single user by its id, and
-   * returns the user, if successful.
-   * It handles the GET /api/user endpoint.
+   * Get the details of a logged in user
    * @param {Object} req the request body
    * @param {Object} res the response body
    * @param {function} next a call to the next function
    * @returns {Object} the response body
    */
   static get(req, res, next) {
-    User.findById(req.payload.id)
+    const { id } = req.body.decoded;
+    User.findById(id)
       .then((user) => {
         if (!user) {
-          return res.sendStatus(401);
+          errorHelper.decoded('User not found', 404);
         }
-        return res.json({ user: user.toAuthJSON() });
-      })
-      .catch(next);
+        return res
+          .json({ user: userControllerHelper.userDetails(user) });
+      }).catch(next);
   }
 
   /**
@@ -146,7 +111,7 @@ class UserController {
    * @param {function} next a call to the next function
    * @returns {Object} the response body
    */
-  static update(req, res) {
+  static update(req, res, next) {
     const foundUser = req.user;
     const {
       firstName, lastName, username, password, bio, image,
@@ -162,16 +127,8 @@ class UserController {
       ? hashPassword(password, user.salt) : foundUser.hash;
     return user.save()
       .then(() => res.status(200).json({
-        user: {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email,
-          username: user.username,
-          image: user.image,
-          bio: user.bio,
-          verified: user.verified,
-        },
-      }));
+        user: userControllerHelper.userDetails(user),
+      })).catch(next);
   }
 
   /**
@@ -186,25 +143,20 @@ class UserController {
     const { token } = req.params;
     const decoded = tokenService.verifyToken(token, process.env.AUTH_SECRET);
     if (!decoded) {
-      return res.status(400)
-        .json({ errors: { message: 'The link has expired' } });
+      errorHelper.throwError('The link has expired', 400);
     }
     return User.findById(decoded.id)
       .then((user) => {
         const validateUser = verificationHelper.validateUser(user);
         if (!validateUser.status) {
-          return res.status(validateUser.statusCode).json(validateUser.error);
+          errorHelper.throwError(validateUser.error, validateUser.statusCode);
         }
         const verifyUser = user;
         verifyUser.verified = true;
         verifyUser.save();
         return res.status(200)
-          .json({
-            status: 'success',
-            message: 'Your account has been verified',
-          });
-      })
-      .catch(next);
+          .json({ message: 'Your account has been verified' });
+      }).catch(next);
   }
 
   /**
@@ -220,20 +172,18 @@ class UserController {
     email = email ? email.trim() : undefined;
     const validateEmail = verificationHelper.validateEmail(email);
     if (!validateEmail.status) {
-      return res.status(validateEmail.statusCode).json(validateEmail.error);
+      errorHelper
+        .throwError(validateEmail.error, validateEmail.statusCode);
     }
     return User.findOne({ where: { email } })
       .then((user) => {
         const validateUser = verificationHelper.validateUser(user);
-        if (validateUser.status) {
-          // return a promise call to send verification
-          // email if validation passes
-          return verificationHelper.sendVerificationEmail(user);
+        if (!validateUser.status) {
+          errorHelper.throwError(validateUser.error, validateUser.statusCode);
         }
-        // generate and throw an error if user validation fails
-        const error = new Error(validateUser.error.errors.message);
-        error.status = validateUser.statusCode;
-        throw error;
+        // return a promise call to send verification
+        // email if validation passes
+        return verificationHelper.sendVerificationEmail(user);
       })
       .then(() => res.status(200)
         .json({ message: 'Your verification link has been resent' }))
@@ -252,29 +202,23 @@ class UserController {
     const { email } = req.body.user;
     return User.findOne({
       where: { email },
-    })
-      .then((user) => {
-        if (!user) {
-          return res.status(404)
-            .json({ errors: { message: 'User not found!' } });
-        }
-        const token = tokenService
-          .generateToken({ id: user.id, username: user.username }, 60 * 30);
-        let url = `${process.env.BASEURL}`;
-        url += `/api/users/reset-password?token=${token}`;
-        const mailOptions = emailService.mailOptions(
-          user.email,
-          "Authors Heaven's account token",
-          emailTemplates.resetPasswordTemplate(url, user),
-        );
-        emailService.sendMail(mailOptions)
-          .then(() => res.status(200).json({
-            message: 'Check your email for password reset token',
-          }))
-          .catch(next);
-        return null;
-      })
-      .catch(next);
+    }).then((user) => {
+      if (!user) {
+        errorHelper.throwError('User not found', 404);
+      }
+      const token = tokenService
+        .generateToken({ id: user.id, username: user.username }, 1800);
+      let url = `${process.env.BASEURL}`;
+      url += `/api/users/reset-password?token=${token}`;
+      const mailOptions = emailService.mailOptions(
+        user.email,
+        "Authors Heaven's account token",
+        emailTemplates.resetPasswordTemplate(url, user),
+      );
+      return emailService.sendMail(mailOptions);
+    }).then(() => res.status(200).json({
+      message: 'Check your email for password reset token',
+    })).catch(next);
   }
 
   /**
@@ -287,12 +231,9 @@ class UserController {
   static resetPassword(req, res) {
     const { token } = req.query;
     const decoded = tokenService.verifyToken(token);
-
     if (!decoded) {
-      return res.status(401)
-        .json({ errors: { message: 'Invalid token' } });
+      errorHelper.throwError('Invalid token', 401);
     }
-
     return res.status(200)
       .json({
         message: 'Verification Successful, You can now reset your password',
@@ -319,10 +260,8 @@ class UserController {
                 username: result.username, message: 'Password updated!',
               }));
         }
-        return res.status(400)
-          .json({ errors: { message: 'User not found' } });
-      })
-      .catch(next);
+        return errorHelper.throwError('User not found', 404);
+      }).catch(next);
   }
 
   /**
@@ -334,34 +273,16 @@ class UserController {
    */
   static getProfile(req, res, next) {
     const { username } = req.params;
-    let owner = false;
-    const token = req.headers.authorization;
-    // get the username from the header token if present
-    const decoded = tokenService.verifyToken(token);
-    // check to see if the profile belongs to the logged in user
-    if (decoded.username === username) owner = true;
     User.findOne({ where: { username } })
       .then((user) => {
         if (!user) {
-          return res.status(404)
-            .json({ errors: { message: 'User not found' } });
+          errorHelper.throwError('User not found', 404);
         }
-        const profile = {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          username: user.username,
-          image: user.image,
-          bio: user.bio,
-          owner,
-        };
-        // only return verification status for ...
-        // logged in users checking their profile
-        if (owner) {
-          profile.verified = user.verified;
-        }
-        return res.status(200).json({ profile });
-      })
-      .catch(next);
+        return res.status(200)
+          .json({
+            profile: userControllerHelper.userDetails(user),
+          });
+      }).catch(next);
   }
 
 
@@ -372,13 +293,12 @@ class UserController {
    * @param {function} next a call to the next function
    * @returns {Object} the response body
    */
-  static getAllProfile(req, res, next) {
-    // get query params
+  static getAllProfiles(req, res, next) {
     const { search } = req.query;
-    // set the default limit
-    const limit = req.query.limit <= 20 ? req.query.limit : 20;
-    // set the default offset
-    const offset = req.query.offset >= 0 ? req.query.offset : 0;
+    let { limit } = req.query;
+    const { page } = req.query;
+    limit = limit <= 20 ? limit : 20;
+    const offset = page > 0 ? ((page - 1) * limit) : 0;
     const dbQuery = {
       limit,
       offset,

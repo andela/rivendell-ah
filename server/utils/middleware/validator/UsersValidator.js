@@ -1,13 +1,15 @@
 import models from '../../../database/models';
 import validator from '../../helpers/validatorHelper';
 import tokenService from '../../services/tokenService';
+import errorHelper from '../../helpers/errorHelper';
 
 const { User } = models;
 
 /**
  * Validation middleware for users route
  */
-class UsersValidator {/**
+class UsersValidator {
+  /**
   * Function validates user Sign up inputs with customized error messages
   * @param {Object} req the request body
   * @param {Object} res the response body
@@ -15,6 +17,9 @@ class UsersValidator {/**
   * @returns {undefined}
   */
   static signup(req, res, next) {
+    if (!req.body.user) {
+      errorHelper.throwError('Please provide the required fields', 400);
+    }
     // User Signup inputs
     const userInput = {
       username: req.body.user.username,
@@ -27,8 +32,7 @@ class UsersValidator {/**
     const validation = validator.signupRules(userInput);
     if (validation) {
       return res.status(400).json({
-        status: 'fail',
-        error: validation,
+        errors: validation,
       });
     }
     // Checking if email already exists in DB
@@ -44,25 +48,45 @@ class UsersValidator {/**
         if (user) {
           if (user.email === userInput.email
             && user.username === userInput.username) {
-            return res.status(400).json({
-              status: 'fail',
-              error: 'Email and Username entered already exists',
-            });
+            errorHelper
+              .throwError('Email and Username entered already exists', 400);
           }
           if (user.email === userInput.email) {
-            return res.status(400).json({
-              status: 'fail',
-              error: 'Email entered already exists',
-            });
+            errorHelper
+              .throwError('Email entered already exists', 400);
           }
-          return res.status(400).json({
-            status: 'fail',
-            error: 'Username entered already exists',
-          });
+          errorHelper
+            .throwError('Username entered already exists', 400);
         }
-        return next();
+        next();
       })
       .catch(next);
+  }
+
+  /**
+    * Function validates user login inputs with customized error messages
+    * @param {Object} req the request body
+    * @param {Object} res the response body
+    * @param {function} next a call to the next function
+    * @returns {undefined}
+    */
+  static login(req, res, next) {
+    if (!req.body.user) {
+      errorHelper.throwError('Please provide the required fields', 400);
+    }
+    // User login inputs
+    const userInput = {
+      email: req.body.user.email,
+      password: req.body.user.password,
+    };
+    // Validation of user Inputs
+    const validation = validator.loginRules(userInput);
+    if (validation) {
+      return res.status(400).json({
+        errors: validation,
+      });
+    }
+    return next();
   }
 
   /**
@@ -78,8 +102,7 @@ class UsersValidator {/**
     const validation = validator.forgotPasswordRules({ email });
     if (validation) {
       return res.status(400).json({
-        status: 'fail',
-        error: validation,
+        errors: validation,
       });
     }
     return next();
@@ -96,34 +119,31 @@ class UsersValidator {/**
     const token = req.headers.authorization;
     const { password, confirm } = req.body.user;
     const validation = validator.resetPasswordRules({ password });
-
     if (token === undefined) {
-      return res.status(400)
-        .json({ errors: { message: 'Token can not be undefined' } });
+      errorHelper
+        .throwError('Token can not be undefined', 400);
     }
     if (token === '') {
-      return res.status(400)
-        .json({ errors: { message: 'Token can not be empty' } });
+      errorHelper
+        .throwError('Token can not be empty', 400);
     }
     const resetToken = tokenService.verifyToken(token, process.env.JWT_SECRET);
-
     if (!resetToken) {
-      return res.status(401)
-        .json({ errors: { message: 'Invalid token' } });
+      errorHelper
+        .throwError('Invalid token', 401);
     }
     if (validation) {
-      return res.status(400).json({
-        status: 'fail',
-        error: validation,
+      res.status(400).json({
+        errors: validation,
       });
     }
     if (password !== confirm) {
-      return res.status(409)
-        .json({ errors: { message: 'Password does not match' } });
+      errorHelper
+        .throwError('Password does not match', 409);
     }
     req.resetToken = resetToken;
     req.password = password;
-    return next();
+    next();
   }
 
   /**
@@ -136,8 +156,8 @@ class UsersValidator {/**
   static updateUser(req, res, next) {
     const { decoded } = req.body;
     if (!req.body.user) {
-      return res.status(400)
-        .json({ errors: { message: 'No update data provided' } });
+      errorHelper
+        .throwError('No update data provided', 400);
     }
     let {
       firstName, lastName, password, username,
@@ -163,12 +183,8 @@ class UsersValidator {/**
           // make sure provided user name is not already taken
           if (user.username === username
             && user.email !== decoded.email) {
-            return res.status(400)
-              .json({
-                errors: {
-                  message: 'Username provided is already taken',
-                },
-              });
+            errorHelper
+              .throwError('Username provided is already taken', 400);
           }
         }
         // update the req body with validated input

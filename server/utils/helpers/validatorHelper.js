@@ -80,6 +80,23 @@ const signupRules = (userInput) => {
   return false;
 };
 
+const loginRules = (userInput) => {
+  // Validator rules
+  const rules = {
+    email: 'required',
+    password: 'required',
+  };
+  // Setting up customized descriptive messages
+  const validation = new Validator(userInput, rules, {
+    'required.email': validationErrors.email.required,
+    'required.password': validationErrors.password.required,
+  });
+  if (validation.fails()) {
+    return validation.errors.all();
+  }
+  return false;
+};
+
 const forgotPasswordRules = (userInput) => {
   // Validator rules
   const rules = {
@@ -225,4 +242,5 @@ export default {
   updateArticleRules,
   createCommentRules,
   updateCommentRules,
+  loginRules,
 };

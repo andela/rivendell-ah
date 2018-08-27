@@ -1,4 +1,5 @@
 import validator from '../../helpers/validatorHelper';
+import errorHelper from '../../helpers/errorHelper';
 
 /**
  * Function validates user inputs when creating an article
@@ -8,12 +9,9 @@ import validator from '../../helpers/validatorHelper';
  * @returns {undefined}
  */
 const createArticle = (req, res, next) => {
-  if ((!req.body.article) || (!req.body.article.body
-    && !req.body.article.description
-    && !req.body.article.title)) {
-    return res.status(422).json({
-      errors: { message: 'No data specified. No Article created' },
-    });
+  if (!req.body.article) {
+    errorHelper
+      .throwError('No data specified. No Article created', 400);
   }
   // User inputs for creating an article
   const articleInput = {
@@ -25,19 +23,16 @@ const createArticle = (req, res, next) => {
   const validation = validator.createArticleRules(articleInput);
   if (validation) {
     return res.status(400).json({
-      error: validation,
+      errors: validation,
     });
   }
   return next();
 };
 
 const updateArticle = (req, res, next) => {
-  if ((!req.body.article) || (!req.body.article.body
-    && !req.body.article.description
-    && !req.body.article.title)) {
-    return res.status(422).json({
-      errors: { message: 'No data specified. No update was made' },
-    });
+  if (!req.body.article) {
+    errorHelper
+      .throwError('No data specified. No update was made', 400);
   }
   // User inputs for creating an article
   const articleInput = {
@@ -49,7 +44,7 @@ const updateArticle = (req, res, next) => {
   const validation = validator.updateArticleRules(articleInput);
   if (validation) {
     return res.status(400).json({
-      error: validation,
+      errors: validation,
     });
   }
   return next();

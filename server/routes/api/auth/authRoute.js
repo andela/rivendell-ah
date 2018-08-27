@@ -6,34 +6,34 @@ const router = Router();
 
 
 router.get(
-  '/google',
+  '/auth/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }),
 );
 
 router.get(
-  '/linkedin',
+  '/auth/linkedin',
   passport.authenticate('linkedin'),
 );
 
 router.get(
-  '/facebook',
+  '/auth/facebook',
   passport.authenticate('facebook', { scope: ['email'] }),
 );
 
 router.get(
-  '/google/redirect',
+  '/auth/google/redirect',
   passport.authenticate('google', { session: false }),
   OauthController.handleRedirect,
 );
 
 router.get(
-  '/linkedin/redirect',
+  '/auth/linkedin/redirect',
   passport.authenticate('linkedin', { session: false }),
   OauthController.handleRedirect,
 );
 
 router.get(
-  '/facebook/redirect',
+  '/auth/facebook/redirect',
   passport.authenticate('facebook', {
     session: false,
     scope: ['email'],

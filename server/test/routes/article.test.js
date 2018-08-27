@@ -63,36 +63,30 @@ describe('Testing articles routes', () => {
         .set('Authorization', token)
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.error.title[0]).to.equal('Title must be a String');
-          expect(res.body.error.description[0]).to.equal('Description must be a String');
-          expect(res.body.error.body[0]).to.equal('Body must be a String');
+          expect(res.body.errors.title[0]).to.equal('Title must be a String');
+          expect(res.body.errors.description[0]).to.equal('Description must be a String');
+          expect(res.body.errors.body[0]).to.equal('Body must be a String');
           done();
         });
     })
   })
 
   describe('Creating an Article with no user inputs', () => {
-    it('Should return a 422(Unprocessible Entity) error', (done) => {
+    it('Should return a 400 error', (done) => {
       chai.request(server)
         .post(`${baseUrl}`)
-        .send({
-          article: {
-            title: '',
-            description: '',
-            body: ''
-          }
-        })
         .set('Authorization', token)
         .end((err, res) => {
-          expect(res.status).to.equal(422);
+          expect(res.status).to.equal(400);
           expect(res.body).to.have.property('errors');
-          expect(res.body.errors).to.have.property('message').equal('No data specified. No Article created');
+          expect(res.body.errors).to.have.property('message')
+            .to.equal('No data specified. No Article created');
           done();
         });
     })
   })
-  describe('Creating an Article with no user inputs', () => {
-    it('Should return a 422(Unprocessible Entity) error', (done) => {
+  describe('Creating an Article with no title', () => {
+    it('Should return a 400 error', (done) => {
       chai.request(server)
         .post(`${baseUrl}`)
         .send({
@@ -105,13 +99,13 @@ describe('Testing articles routes', () => {
         .set('Authorization', token)
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.error.title[0]).to.equal('Please specify a title for your Article');
+          expect(res.body.errors.title[0]).to.equal('Please specify a title for your Article');
           done();
         });
     })
   })
-  describe('Creating an Article with no user inputs', () => {
-    it('Should return a 422(Unprocessible Entity) error', (done) => {
+  describe('Creating an Article with no description', () => {
+    it('Should return a 400 error', (done) => {
       chai.request(server)
         .post(`${baseUrl}`)
         .send({
@@ -124,14 +118,14 @@ describe('Testing articles routes', () => {
         .set('Authorization', token)
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.error.description[0]).to.equal('Please specify a description for your Article');
+          expect(res.body.errors.description[0]).to.equal('Please specify a description for your Article');
           done();
         });
     })
   })
 
-  describe('Creating an Article with no user inputs', () => {
-    it('Should return a 422(Unprocessible Entity) error', (done) => {
+  describe('Creating an Article with no body', () => {
+    it('Should return a 400 error', (done) => {
       chai.request(server)
         .post(`${baseUrl}`)
         .send({
@@ -144,7 +138,7 @@ describe('Testing articles routes', () => {
         .set('Authorization', token)
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.error.body[0]).to.equal('Please specify a body for your Article');
+          expect(res.body.errors.body[0]).to.equal('Please specify a body for your Article');
           done();
         });
     })
@@ -167,7 +161,9 @@ describe('Testing articles routes', () => {
         .get(`${baseUrl}wrong-slug`)
         .end((err, res) => {
           expect(res.status).to.equal(404);
-          expect(res.body).to.have.property('message').equal('Article not found');
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.have.property('message')
+            .to.equal('Article not found');
           done();
         });
     })
@@ -408,26 +404,6 @@ describe('Testing articles routes', () => {
         });
     })
   })
-  describe('Updating an Article with no parameters', () => {
-    it('Should return a 422(Unprocessible Entity) error', (done) => {
-      chai.request(server)
-        .put(`${baseUrl}${slug}`)
-        .send({
-          article: {
-            title: '',
-            description: '',
-            body: ''
-          }
-        })
-        .set('Authorization', token)
-        .end((err, res) => {
-          expect(res.status).to.equal(422);
-          expect(res.body).to.have.property('errors');
-          expect(res.body.errors).to.have.property('message').equal('No data specified. No update was made');
-          done();
-        });
-    })
-  })
 
   describe('Updating an Article with no request body', () => {
     it('Should return a 422(Unprocessible Entity) error', (done) => {
@@ -436,9 +412,10 @@ describe('Testing articles routes', () => {
         .send()
         .set('Authorization', token)
         .end((err, res) => {
-          expect(res.status).to.equal(422);
+          expect(res.status).to.equal(400);
           expect(res.body).to.have.property('errors');
-          expect(res.body.errors).to.have.property('message').equal('No data specified. No update was made');
+          expect(res.body.errors).to.have.property('message')
+          .to.equal('No data specified. No update was made');
           done();
         });
     })
@@ -458,9 +435,9 @@ describe('Testing articles routes', () => {
         .set('Authorization', token)
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.error.title[0]).to.equal('Title must be a String');
-          expect(res.body.error.description[0]).to.equal('Description must be a String');
-          expect(res.body.error.body[0]).to.equal('Body must be a String');
+          expect(res.body.errors.title[0]).to.equal('Title must be a String');
+          expect(res.body.errors.description[0]).to.equal('Description must be a String');
+          expect(res.body.errors.body[0]).to.equal('Body must be a String');
           done();
         });
     })
@@ -479,7 +456,9 @@ describe('Testing articles routes', () => {
         .set('Authorization', token)
         .end((err, res) => {
           expect(res.status).to.equal(404);
-          expect(res.body).to.have.property('message').equal('Article not found. Cannot Update');
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.have.property('message')
+            .to.equal('Article not found. Cannot Update');
           done();
         });
     })
@@ -502,7 +481,9 @@ describe('Testing articles routes', () => {
         .set('Authorization', token)
         .end((err, res) => {
           expect(res.status).to.equal(404);
-          expect(res.body).to.have.property('message').equal('Article not found');
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.have.property('message')
+            .to.equal('Article not found');
           done();
         });
     })
