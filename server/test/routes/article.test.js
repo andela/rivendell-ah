@@ -187,7 +187,6 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .get(`${baseUrl}?limit=1&page=1`)
         .end((err, res) => {
-          console.log(res.body, 'the evil body')
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('articles');
           expect(res.body.articles.length).to.be.gte(1);
@@ -201,7 +200,6 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .get(`${baseUrl}?limit=veqvgef&page=eeffeq`)
         .end((err, res) => {
-          console.log(res.body, 'very evil body');
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('articles');
           expect(res.body.articles.length).to.be.gte(1);
@@ -230,7 +228,6 @@ describe('Testing articles routes', () => {
       chai.request(server)
         .get(`${baseUrl}`)
         .end((err, res) => {
-          console.log('Take me!!!',res.body);
           creationDate = res.body.articles[0].createdAt.split('T')[0];
           startDate = '2018-07-20';
           endDate = '2050-08-20';

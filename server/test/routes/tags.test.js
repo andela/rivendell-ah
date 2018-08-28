@@ -8,7 +8,7 @@ import { User } from '../../database/models';
 
 use(chaiHttp);
 
-
+let slug;
 let token;
 const ARTICLE_ROUTE = '/api/articles';
 
@@ -62,6 +62,8 @@ describe('when an author creates an article with new tags and authentication is 
             .to.be.an('array');
           expect(res.body.article.tags.length <= 20)
             .to.be.true;
+
+          slug = res.body.article.slug;
           done();
         });
     });
@@ -79,6 +81,71 @@ describe('when an author creates an article with new tags and authentication is 
             .property('status').to.equal(201);
           expect(res.body.article.tags.length <= 20)
             .to.be.true;
+          done();
+        });
+    });
+  });
+});
+
+
+describe('when users retrieve articles via GET(/api/article)', () => {
+  describe('when articles exists in the database', () => {
+    it('should return an articles array and each element should have a tags attribute', (done) => {
+      request(server)
+        .get(ARTICLE_ROUTE)
+        .set('Authorization', token)
+        .end((err, res) => {
+          expect(res)
+            .property('status').to.equal(200);
+          expect(res.body)
+            .property('articles');
+          expect(res.body.articles[0])
+            .to.be.an('object');
+          expect(res.body.articles[0])
+            .to.haveOwnProperty('tags');
+          done();
+        });
+    });
+  });
+  describe('when a tag filter is specified', () => {
+    it('should return tags that contain the specified letter', (done) => {
+      request(server)
+        .get(`${ARTICLE_ROUTE}?tag=${mockData.tags2[0]}`)
+        .set('Authorization', token)
+        .end((err, res) => {
+          expect(res)
+            .property('status').to.equal(200);
+          expect(res.body)
+            .property('articles');
+          expect(res.body.articles[0])
+            .to.be.an('object');
+          expect(res.body.articles[0])
+            .to.haveOwnProperty('tags');
+
+          expect(res.body.articles[0].tags.indexOf(mockData.tags2[0]))
+            .to.be.gte(0);
+          done();
+        });
+    });
+  });
+});
+
+
+describe('when users an article via GET(/api/article/:slug)', () => {
+  describe('when the article exists in the database', () => {
+    it('should return an articles array and each element should have a tags attribute', (done) => {
+      request(server)
+        .get(`${ARTICLE_ROUTE}/${slug}`)
+        .set('Authorization', token)
+        .end((err, res) => {
+          expect(res)
+            .property('status').to.equal(200);
+          expect(res.body)
+            .property('article');
+          expect(res.body.article)
+            .to.be.an('object');
+          expect(res.body.article)
+            .to.haveOwnProperty('tags');
           done();
         });
     });

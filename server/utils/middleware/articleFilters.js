@@ -48,7 +48,7 @@ const articleFilters = (req, res, next) => {
   if (tag) {
     req.filterByTag = {
       name: {
-        [Op.like]: `%${tag || ''}%`,
+        [Op.like]: `%${tag}%`,
       },
     };
   }
