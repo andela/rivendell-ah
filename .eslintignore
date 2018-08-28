@@ -1,7 +1,6 @@
 /node_modules/**
 /coverage/**
-server/migrations/**
-server/seeders/**
+server/database/**
 server/test/**
 .env
 

@@ -7,7 +7,7 @@ const { Op } = Sequelize;
 const articleFilters = (req, res, next) => {
   const {
     title, description, body, startDate, endDate,
-    username, firstName, lastName,
+    username, firstName, lastName, tag,
   } = req.query;
   req.filterByArticleAttributes = {
     [Op.and]: [
@@ -44,6 +44,14 @@ const articleFilters = (req, res, next) => {
       [Op.like]: `%${lastName || ''}%`,
     },
   };
+
+  if (tag) {
+    req.filterByTag = {
+      name: {
+        [Op.like]: `%${tag}%`,
+      },
+    };
+  }
   return next();
 };
 

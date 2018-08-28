@@ -2,15 +2,14 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import server from '../../index';
 
-/* eslint-disable */
 const { expect } = chai;
 chai.use(chaiHttp);
 const author = {};
 const reader = {};
 const reader2 = {};
 const reader3 = {};
-const article = {};
-const article2 = {};
+let mockArticle = {};
+let secondMockArticle = {};
 const userFalseUpdate = {};
 
 
@@ -158,7 +157,7 @@ describe('Article rating', () => {
         },
       })
       .end((err, res) => {
-        Object.assign(article, res.body);
+        mockArticle = res.body;
         done();
       });
   });
@@ -175,7 +174,7 @@ describe('Article rating', () => {
         },
       })
       .end((err, res) => {
-        Object.assign(article2, res.body);
+        secondMockArticle = res.body;
         done();
       });
   });
@@ -184,7 +183,7 @@ describe('Article rating', () => {
   describe('users rate article', () => {
     it('unauthenticated users should not be able to rate an article', (done) => {
       chai.request(server)
-        .post(`/api/articles/${article.article.slug}/rating`)
+        .post(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', 'somethingrandomthatisrandom')
         .send({
           rating: 5,
@@ -199,7 +198,7 @@ describe('Article rating', () => {
 
     it('unverified users should not be able to rate an article', (done) => {
       chai.request(server)
-        .post(`/api/articles/${article.article.slug}/rating`)
+        .post(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', `${reader3.user.token}`)
         .send({
           rating: 5,
@@ -215,7 +214,7 @@ describe('Article rating', () => {
 
     it('The authors should not be able to rate their articles', (done) => {
       chai.request(server)
-        .post(`/api/articles/${article.article.slug}/rating`)
+        .post(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', author.user.token)
         .send({
           rating: 5,
@@ -231,7 +230,7 @@ describe('Article rating', () => {
 
     it('should not rate an article if no rating value is provided', (done) => {
       chai.request(server)
-        .post(`/api/articles/${article.article.slug}/rating`)
+        .post(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', reader.user.token)
         .send({
           rating: '',
@@ -247,7 +246,7 @@ describe('Article rating', () => {
 
     it('Rating for articles should not be more than 5', (done) => {
       chai.request(server)
-        .post(`/api/articles/${article.article.slug}/rating`)
+        .post(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', reader.user.token)
         .send({
           rating: 6,
@@ -263,7 +262,7 @@ describe('Article rating', () => {
 
     it('Rating for articles should not be less than 1', (done) => {
       chai.request(server)
-        .post(`/api/articles/${article.article.slug}/rating`)
+        .post(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', reader.user.token)
         .send({
           rating: 0.9,
@@ -311,7 +310,7 @@ describe('Article rating', () => {
 
     it('A login user should be able to rate an article after reading it', (done) => {
       chai.request(server)
-        .post(`/api/articles/${article.article.slug}/rating`)
+        .post(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', reader.user.token)
         .send({
           rating: 3,
@@ -326,7 +325,7 @@ describe('Article rating', () => {
 
     it('A login user should be able to rate an article after reading it', (done) => {
       chai.request(server)
-        .post(`/api/articles/${article.article.slug}/rating`)
+        .post(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', reader2.user.token)
         .send({
           rating: 5,
@@ -340,7 +339,7 @@ describe('Article rating', () => {
 
     it('A login user should be able to rate an article only once', (done) => {
       chai.request(server)
-        .post(`/api/articles/${article.article.slug}/rating`)
+        .post(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', reader.user.token)
         .send({
           rating: 4,
@@ -380,7 +379,7 @@ describe('Article rating', () => {
   describe('get rating for an article', () => {
     it('it should return the rating for the article with articleId', (done) => {
       chai.request(server)
-        .get(`/api/articles/${article.article.slug}/rating`)
+        .get(`/api/articles/${mockArticle.article.slug}/rating`)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.have.property('ratingDetails');
@@ -413,7 +412,7 @@ describe('Article rating', () => {
   describe('update article', () => {
     it('unverified users should not be able to update article rating', (done) => {
       chai.request(server)
-        .put(`/api/articles/${article.article.slug}/rating`)
+        .put(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', `${reader3.user.token}`)
         .send({
           rating: 5,
@@ -429,7 +428,7 @@ describe('Article rating', () => {
 
     it('authors should not be able to rater their articles', (done) => {
       chai.request(server)
-        .put(`/api/articles/${article.article.slug}/rating`)
+        .put(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', author.user.token)
         .send({
           rating: 5,
@@ -445,7 +444,7 @@ describe('Article rating', () => {
 
     it('users should be able to update their ratings', (done) => {
       chai.request(server)
-        .put(`/api/articles/${article.article.slug}/rating`)
+        .put(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', reader.user.token)
         .send({
           rating: 5,
@@ -461,7 +460,7 @@ describe('Article rating', () => {
 
     it('should not update if user has not previously rated', (done) => {
       chai.request(server)
-        .put(`/api/articles/${article.article.slug}/rating`)
+        .put(`/api/articles/${mockArticle.article.slug}/rating`)
         .set('Authorization', userFalseUpdate.user.token)
         .send({
           rating: 5,

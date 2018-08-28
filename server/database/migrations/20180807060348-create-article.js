@@ -9,7 +9,8 @@ module.exports = {
         defaults: Sequelize.UUIDV4,
       },
       slug: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING, 
+        unique: true,
       },
       title: {
         type: Sequelize.TEXT,
@@ -34,6 +35,7 @@ module.exports = {
       authorId: {
         type: Sequelize.INTEGER,
         onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
         references: {
           model: 'Users',
           key: 'id',
