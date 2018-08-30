@@ -1,18 +1,32 @@
 module.exports = (sequelize, DataTypes) => {
   const Follow = sequelize.define('Follow', {
+    id: {
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+    },
     followingId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
     },
     followerId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: false,
       validate: {
         notEmpty: true,
       },
+    },
+    inApp: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    email: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
     },
   }, {});
   Follow.associate = (models) => {

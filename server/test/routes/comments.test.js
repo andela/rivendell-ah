@@ -3,7 +3,7 @@ import chai from 'chai'
 import faker from 'faker'
 import chaiHttp from 'chai-http'
 import dotenv from 'dotenv';
-import server from '../../index';
+import { server } from '../../index';
 import models from '../../database/models';
 import tokenService from '../../utils/services/tokenService';
 import { User } from '../../database/models';
@@ -393,9 +393,9 @@ describe('Comment routes', () => {
   });
 
   describe('Making a DELETE request to api/articles/:slug/comments/:id to delete a comment', () => {
-    it('Should return error 404, if the id is invalid', (done) => {
+    it('Should return error 404, if the id does not exist in the comments table', (done) => {
       chai.request(server)
-        .delete(`${baseUrl}/${megameArticle1.slug}/comments/0`)
+        .delete(`${baseUrl}/${megameArticle1.slug}/comments/9cc22b9e-cccc-aaaa-bbbb-41e796bab71e`)
         .set({ authorization: verifiedToken })
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -419,7 +419,7 @@ describe('Comment routes', () => {
   describe('Making a GET request to api/articles/:slug/comments/:id to get a comment', () => {
     it('Should return error 404, if the id provided is not tied to a comment', (done) => {
       chai.request(server)
-        .get(`${baseUrl}/${megameArticle1.slug}/comments/1000`)
+        .get(`${baseUrl}/${megameArticle1.slug}/comments/9cc22b9e-cccc-aaaa-bbbb-41e796bab71e`)
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.haveOwnProperty('errors')

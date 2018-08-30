@@ -2,7 +2,7 @@
 import { expect, use, request } from 'chai';
 import { describe, it, before } from 'mocha';
 import chaiHttp from 'chai-http';
-import server from '../../index';
+import { server } from '../../index';
 import mockData from './mockData';
 import tokenService from '../../utils/services/tokenService';
 import { User } from '../../database/models';

@@ -4,6 +4,12 @@ import crypto from 'crypto';
 
 export default (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
+    id: {
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+    },
     firstName: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -89,6 +95,14 @@ export default (sequelize, DataTypes) => {
     User.hasMany(models.Comment, {
       foreignKey: 'authorId',
       as: 'userComments',
+    });
+    User.hasMany(models.Notification, {
+      foreignKey: 'sourceId',
+      as: 'notificationSource',
+    });
+    User.hasMany(models.Notification, {
+      foreignKey: 'authorId',
+      as: 'notificationOwner',
     });
   };
   return User;

@@ -1,38 +1,54 @@
 /* eslint-disable */
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Follows', {
+    return queryInterface.createTable("Follows", {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
       followingId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         references: {
-          model: 'Users',
-          key: 'id',
-        },
+          model: "Users",
+          key: "id"
+        }
       },
       followerId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         references: {
-          model: 'Users',
-          key: 'id',
-        },
+          model: "Users",
+          key: "id"
+        }
+      },
+      inApp: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      email: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      inApp: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
+      },
+      email: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: true,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE,
+        type: Sequelize.DATE
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE,
-      },
+        type: Sequelize.DATE
+      }
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Follows');
-  },
+    return queryInterface.dropTable("Follows");
+  }
 };

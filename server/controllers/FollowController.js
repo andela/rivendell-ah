@@ -1,8 +1,11 @@
 import models from '../database/models';
 import errorHelper from '../utils/helpers/errorHelper';
 import followControllerHelper from '../utils/helpers/followControllerHelper';
+import notificationService from '../utils/services/notificationService';
 
 const { User, Follow } = models;
+
+const { notify } = notificationService;
 
 /**
  *
@@ -21,7 +24,7 @@ class FollowController {
    */
   static follow(req, res, next) {
     const { id: followerId } = req.body.decoded;
-    const followingId = parseInt(req.params.userId, 10);
+    const followingId = req.params.userId;
     // Ensure a user cannot follow him/her self
     if (followingId === followerId) {
       errorHelper.throwError('You cannot follow yourself', 422);
@@ -38,6 +41,11 @@ class FollowController {
               errorHelper
                 .throwError('You are already following this User', 422);
             }
+            // initialize notification params
+            const type = 'following';
+            const entityId = userFollower.id;
+            // notify users of interest
+            notify(entityId, type, followerId, followingId, null, null);
             // Return user's profile
             return res.status(201).json({
               profile: followControllerHelper.userProfile(user, true),

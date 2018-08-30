@@ -21,10 +21,9 @@ class RatingController {
    */
   static rateArticle(req, res, next) {
     let { rating } = req.body;
-    let userId = req.body.decoded.id;
+    const userId = req.body.decoded.id;
     const { slug } = req.params;
     rating = parseInt(rating, 10);
-    userId = parseInt(userId, 10);
     return Article
       .find({ where: { slug } })
       .then((article) => {
@@ -67,10 +66,9 @@ class RatingController {
    */
   static updateRating(req, res, next) {
     let { rating } = req.body;
-    let userId = req.body.decoded.id;
+    const userId = req.body.decoded.id;
     const { slug } = req.params;
     rating = parseInt(rating, 10);
-    userId = parseInt(userId, 10);
     return Article
       .find({ where: { slug } })
       .then((article) => {

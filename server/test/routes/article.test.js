@@ -1,6 +1,7 @@
-import chai from 'chai';
-import chaiHttp from 'chai-http';
-import server from '../../index';
+/* eslint-disable  */
+import chai from 'chai'
+import chaiHttp from 'chai-http'
+import { server } from '../../index';
 import tokenService from '../../utils/services/tokenService';
 import mockData from './mockData';
 import models from '../../database/models';

@@ -1,5 +1,7 @@
 import session from 'express-session';
+import path from 'path';
 import express from 'express';
+import http from 'http';
 import swaggerUI from 'swagger-ui-express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
@@ -7,17 +9,24 @@ import errorhandler from 'errorhandler';
 import methodOverride from 'method-override';
 import morgan from 'morgan';
 import passport from 'passport';
+import socketIO from 'socket.io';
 import routes from './routes';
-import {} from './database/models/user';
-import {} from 'dotenv/config';
-import {} from './configs/passport';
+import './database/models/user';
+import 'dotenv/config';
+import './configs/passport';
 import swaggerDocs from '../swagger.json'; //eslint-disable-line
-
+import socketIo from './utils/services/socketIoService';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
 // Create global app object
 const app = express();
+const server = http.Server(app);
+
+app.get('/front-end', (req, res) => {
+  res.sendFile(path.join(__dirname, '../.client/index.html'));
+});
+
 
 // Normal express config defaults
 app.use(
@@ -86,14 +95,23 @@ app.use((err, req, res, next) => {
   });
 });
 
-
 // finally, let's start our server...
 // do not open a port on test environment,
 // this will be taken care of by mocha
 if (process.env.NODE_ENV !== 'test') {
-  const server = app.listen(process.env.PORT || 3000, () => {
+  server.listen(process.env.PORT || 3000, () => {
     /* eslint-disable no-console */
     console.log(`Listening on port ${server.address().port}`);
   });
 }
-module.exports = app;
+
+// store the socket server in a global variable to enable
+// use in different modules
+global.io = socketIO(server);
+
+socketIo(global.io);
+
+module.exports = {
+  server,
+  app,
+};

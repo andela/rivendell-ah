@@ -6,10 +6,13 @@ import articleControllerHelper from '../utils/helpers/articleControllerHelper';
 import errorHelper from '../utils/helpers/errorHelper';
 import setPaginationParameters
   from '../utils/helpers/setPaginationParametersHelper';
+import notificationService from '../utils/services/notificationService';
 
 const {
   Article, User, Tag, Subcategory, Follow,
 } = models;
+
+const { notify } = notificationService;
 
 /**
  *
@@ -43,13 +46,15 @@ class ArticleController {
     const {
       username, bio, image,
     } = req.user;
-
     const newArticle = {
       id, slug, title, description, body, authorId, subcategoryId,
     };
-
     Article.create(newArticle)
       .then((article) => {
+        // initialize notification params
+        const type = 'create article';
+        // notify users of interest
+        notify(article.id, type, authorId, authorId, article.id, null);
         articleControllerHelper.createAndFindTags(tags)
           .then((tagInstances) => {
             article.addTags(tagInstances)
@@ -93,6 +98,7 @@ class ArticleController {
       const articleObj = article.dataValues;
       articleObj.tags = articleControllerHelper
         .formatTagResponse(article.tags);
+      notificationService.readNotification(req, next);
       return res.status(200).json({
         article: articleObj,
       });

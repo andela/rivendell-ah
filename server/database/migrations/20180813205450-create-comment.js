@@ -4,16 +4,16 @@ module.exports = {
     return queryInterface.createTable('Comments', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID,
+        defaultValue: Sequelize.UUIDV4,
       },
       body: {
         type: Sequelize.STRING,
         allowNull: false,
       },
       parentId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         allowNull: true,
       },
       createdAt: {
@@ -43,7 +43,7 @@ module.exports = {
         },
       },
       authorId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         onDelete: 'CASCADE',
         references: {
           model: 'Users',

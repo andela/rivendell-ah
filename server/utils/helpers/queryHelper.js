@@ -1,29 +1,44 @@
-const getComments = (articleId, limit, offset) => `WITH main_cte AS 
-(SELECT * FROM "Users" usrt LEFT JOIN 
-(SELECT * FROM "Comments" ct1 LEFT JOIN 
-(SELECT "parentId" "pId", count(*) "repliesCount" FROM 
-  "Comments" GROUP BY "parentId") ct2 ON ct2."pId" = ct1.id 
-  WHERE ct1.type = 'main' AND ct1."articleId" = ANY('{${articleId}}'))
-   ctf ON ctf."authorId" = usrt.id ORDER BY ctf."createdAt"), 
-   count_cte AS (SELECT count(*) AS "totalCount" FROM main_cte) 
-   SELECT * FROM main_cte, count_cte LIMIT ${limit} OFFSET ${offset};`;
+// query the database to get comments and total comments of an article,
+// including the owner and reply count of each comment
+const getComments = (articleId, limit, offset) => `WITH 
+main_commenttable AS (SELECT * FROM "Users" userstable LEFT JOIN 
+(SELECT * FROM "Comments" commenttable1 LEFT JOIN 
+(SELECT "parentId" "parentid", count(*) "repliesCount" FROM 
+  "Comments" GROUP BY "parentId") commenttable2 ON 
+  commenttable2."parentid" = commenttable1.id 
+  WHERE commenttable1.type = 'main' AND 
+  commenttable1."articleId" = ANY('{${articleId}}'))
+   commenttablefinal ON commenttablefinal."authorId" = 
+   userstable.id ORDER BY commenttablefinal."createdAt"), 
+   count_comments AS (SELECT count(*) AS "totalCount" FROM main_commenttable) 
+   SELECT * FROM main_commenttable, 
+   count_comments LIMIT ${limit} OFFSET ${offset};`;
 
-const getReplies = (articleId, parentId, limit, offset) => `WITH main_cte AS 
-(SELECT * FROM "Users" usrt LEFT JOIN 
-(SELECT * FROM "Comments"ct1 LEFT JOIN 
-(SELECT "parentId" "pId", count(*) "repliesCount" FROM 
-"Comments" GROUP BY "parentId") ct2 ON ct2."pId" = ct1.id 
-WHERE ct1.type = 'reply' AND ct1."articleId" = ANY('{${articleId}}') 
-AND ct1."parentId" = ${parentId})
- ctf ON ctf."authorId" = usrt.id ORDER BY ctf."createdAt"), 
- count_cte AS (SELECT count(*) AS "totalCount" FROM main_cte) 
- SELECT * FROM main_cte, count_cte LIMIT ${limit} OFFSET ${offset};`;
+// query the database to get replies and total replies of a comment,
+// including the owner and reply count of each reply
+const getReplies = (articleId, parentId, limit, offset) => `WITH 
+main_commenttable AS (SELECT * FROM "Users" userstable LEFT JOIN 
+(SELECT * FROM "Comments" commenttable1 LEFT JOIN 
+(SELECT "parentId" "parentid", count(*) "repliesCount" FROM 
+"Comments" GROUP BY "parentId") commenttable2 ON 
+commenttable2."parentid" = commenttable1.id 
+WHERE commenttable1.type = 'reply' AND 
+commenttable1."articleId" = ANY('{${articleId}}') 
+AND commenttable1."parentId" = ANY('{${parentId}}'))
+ commenttablefinal ON commenttablefinal."authorId" = 
+ userstable.id ORDER BY commenttablefinal."createdAt"), 
+ count_comments AS (SELECT count(*) AS "totalCount" FROM main_commenttable) 
+ SELECT * FROM main_commenttable, 
+ count_comments LIMIT ${limit} OFFSET ${offset};`;
 
-const getComment = commentId => `SELECT * FROM "Users" u JOIN (SELECT * 
-  FROM "Comments" c1 JOIN 
+// get a single comment, including the owner and reply count of the comment
+const getComment = commentId => `SELECT * FROM "Users" 
+userstable JOIN (SELECT * FROM "Comments" commenttable1 JOIN 
 (SELECT "parentId" AS "parentId", count(*) AS "repliesCount" 
-FROM "Comments" GROUP BY "parentId") c2 ON c1.id = c2."parentId" 
-WHERE c1.id = ${commentId}) cf ON u.id = cf."authorId";`;
+FROM "Comments" GROUP BY "parentId") commenttable2 ON 
+commenttable1.id = commenttable2."parentId" 
+WHERE commenttable1.id = ANY('{${commentId}}')) 
+cf ON userstable.id = cf."authorId";`;
 
 export default {
   getComments,
