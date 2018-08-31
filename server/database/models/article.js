@@ -59,6 +59,12 @@ export default (sequelize, DataTypes) => {
       through: 'ArticleTags',
       foreignKey: 'articleId',
     });
+    Article.belongsTo(models.Subcategory, {
+      foreignKey: 'subcategoryId',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+      as: 'subcategory',
+    });
   };
   return Article;
 };

@@ -10,7 +10,11 @@ import { Tag } from '../../database/models'; //eslint-disable-line
  * @returns {Object} response object
  */
 
-const createArticleResponse = (article, username, bio, image) => ({
+
+const createArticleResponse = (
+  article, subcategoryId, subcategoryName,
+  username, bio, image,
+) => ({
   id: article.id,
   title: article.title,
   description: article.description,
@@ -23,6 +27,10 @@ const createArticleResponse = (article, username, bio, image) => ({
     username,
     bio,
     image,
+  },
+  subcategory: {
+    id: subcategoryId,
+    name: subcategoryName,
   },
 });
 
@@ -37,6 +45,20 @@ const includeAuthor = (model, where) => ({
   model,
   as: 'author',
   attributes: ['username', 'bio', 'image'],
+  where,
+});
+
+const includeSubcategory = (model, where) => ({
+  model,
+  as: 'subcategory',
+  attributes: ['id', 'name'],
+  where,
+});
+
+const includeSubcategories = (model, where) => ({
+  model,
+  as: 'subcategories',
+  attributes: ['id', 'name'],
   where,
 });
 
@@ -106,6 +128,8 @@ export default {
   createAndFindTags,
   formatTagResponse,
   includeAuthor,
+  includeSubcategory,
+  includeSubcategories,
   articleAttributes,
   includeTag,
 };

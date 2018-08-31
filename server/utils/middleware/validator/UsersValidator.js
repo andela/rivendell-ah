@@ -39,7 +39,7 @@ class UsersValidator {
     return User.find({
       where: {
         $or: [
-          { username: req.body.user.username },
+          { username: req.body.user.username.toLowerCase() },
           { email: req.body.user.email },
         ],
       },

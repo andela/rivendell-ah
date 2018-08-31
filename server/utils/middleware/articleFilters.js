@@ -6,24 +6,24 @@ const { Op } = Sequelize;
 
 const articleFilters = (req, res, next) => {
   const {
-    title, description, body, startDate, endDate,
-    username, firstName, lastName, tag,
+    title = '', description = '', body = '', startDate, endDate,
+    username = '', firstName = '', lastName = '', subcategory = '', tag,
   } = req.query;
   req.filterByArticleAttributes = {
     [Op.and]: [
       {
         title: {
-          [Op.like]: `%${title || ''}%`,
+          [Op.like]: `%${title}%`,
         },
       },
       {
         description: {
-          [Op.like]: `%${description || ''}%`,
+          [Op.like]: `%${description}%`,
         },
       },
       {
         body: {
-          [Op.like]: `%${body || ''}%`,
+          [Op.like]: `%${body}%`,
         },
       },
       {
@@ -35,13 +35,19 @@ const articleFilters = (req, res, next) => {
   };
   req.filterByAuthorAttributes = {
     username: {
-      [Op.like]: `%${username || ''}%`,
+      [Op.like]: `%${username.toLowerCase()}%`,
     },
     firstName: {
-      [Op.like]: `%${firstName || ''}%`,
+      [Op.like]: `%${firstName}%`,
     },
     lastName: {
-      [Op.like]: `%${lastName || ''}%`,
+      [Op.like]: `%${lastName}%`,
+    },
+  };
+
+  req.filterBySubcategoryAttributes = {
+    name: {
+      [Op.like]: `%${subcategory.toUpperCase()}%`,
     },
   };
 

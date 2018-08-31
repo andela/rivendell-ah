@@ -30,8 +30,10 @@ class UserController {
    */
   static signup(req, res, next) {
     const {
-      firstName, lastName, username, email, password: hash,
+      firstName, lastName, email, password: hash,
     } = req.body.user;
+
+    const username = req.body.user.username.toLowerCase();
     User.create({
       firstName, lastName, username, email, hash,
     }).then(user => (
