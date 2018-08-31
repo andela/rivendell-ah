@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import UserController from '../../controllers/UserController';
+import ArticleController from '../../controllers/ArticleController';
 import UsersValidator from '../../utils/middleware/validator/UsersValidator';
 import AuthMiddleware from '../../utils/middleware/AuthMiddleware';
 
@@ -48,6 +49,13 @@ router.put(
   '/users/reset-password',
   UsersValidator.resetPassword,
   UserController.resetPasswordUpdate,
+);
+
+router.get(
+  '/users/feeds',
+  AuthMiddleware.authenticateUser,
+  AuthMiddleware.verifyUser,
+  ArticleController.getUserFeed,
 );
 
 router.get('/profiles/:username', UserController.getProfile);
