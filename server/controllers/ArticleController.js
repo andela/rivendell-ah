@@ -3,8 +3,12 @@ import uuid from 'uuid/v1';
 import models from '../database/models';
 import articleControllerHelper from '../utils/helpers/articleControllerHelper';
 import errorHelper from '../utils/helpers/errorHelper';
+import setPaginationParameters
+  from '../utils/helpers/setPaginationParametersHelper';
 
-const { Article, User, Tag } = models;
+const {
+  Article, User, Tag, Subcategory,
+} = models;
 
 /**
  *
@@ -31,14 +35,16 @@ class ArticleController {
     const id = uuid();
     const slug = slugCreate(`${title.toLowerCase()}-${id}`);
     const authorId = req.body.decoded.id;
-
-
+    const subcategoryId = req.body.subcategoryDetails
+      ? req.body.subcategoryDetails.id : 1;
+    const subcategoryName = req.body.subcategoryDetails
+      ? req.body.subcategoryDetails.name : 'OTHERS';
     const {
       username, bio, image,
     } = req.user;
 
     const newArticle = {
-      id, slug, title, description, body, authorId,
+      id, slug, title, description, body, authorId, subcategoryId,
     };
 
     Article.create(newArticle)
@@ -48,7 +54,10 @@ class ArticleController {
             article.addTags(tagInstances)
               .then(() => {
                 const articleResponse = articleControllerHelper
-                  .createArticleResponse(article, username, bio, image);
+                  .createArticleResponse(
+                    article, subcategoryId, subcategoryName,
+                    username, bio, image,
+                  );
                 articleResponse.tags = articleControllerHelper
                   .formatTagResponse(tagInstances);
                 res.status(201).json({ article: articleResponse });
@@ -70,8 +79,9 @@ class ArticleController {
     Article.find({
       where: { slug: req.params.slug },
       include: [
-        articleControllerHelper.includeAuthor(User, req.filterByAuthor),
-        articleControllerHelper.includeTag(Tag, req.filterByTag),
+        articleControllerHelper.includeAuthor(User),
+        articleControllerHelper.includeTag(Tag),
+        articleControllerHelper.includeSubcategory(Subcategory),
       ],
       attributes: articleControllerHelper
         .articleAttributes(),
@@ -90,7 +100,7 @@ class ArticleController {
 
   /**
    * Method gets all articles from the database,
-   * It returns a json response of the article retrieved
+   * It returns a json response of the articles retrieved
    * It handles the GET /api/articles.
    * @param {Object} req the request body
    * @param {Object} res the response body
@@ -98,14 +108,11 @@ class ArticleController {
    * @returns {Object} the response body
    */
   static getAllArticle(req, res, next) {
-    let { limit, page } = req.query;
-    limit = +limit < 20 && +limit > 0 ? +limit : 20;
-    page = +page > 0 ? +page : 1;
-    const offset = limit * (page - 1);
+    const paginationParams = setPaginationParameters(req);
     Article.findAndCountAll({
       distinct: 'id',
-      limit,
-      offset,
+      limit: paginationParams.limit,
+      offset: paginationParams.offset,
       order: [['createdAt', 'DESC']],
       where: req.filterByArticleAttributes,
       include: [
@@ -113,6 +120,8 @@ class ArticleController {
           .includeAuthor(User, req.filterByAuthorAttributes),
         articleControllerHelper
           .includeTag(Tag, req.filterByTag),
+        articleControllerHelper
+          .includeSubcategory(Subcategory, req.filterBySubcategoryAttributes),
       ],
       attributes: articleControllerHelper
         .articleAttributes(true),
@@ -135,21 +144,28 @@ class ArticleController {
   /**
    * Method updates an article in the database,
    * It returns a json response of the article updated
-   * It handles the PUT /api/articles/:slug.
+   * It handles the PUT /api/articles/:slug
    * @param {Object} req the request body
    * @param {Object} res the response body
    * @param {function} next a call to the next function
    * @returns {Object} the response body
    */
   static updateArticle(req, res, next) {
-    const { title, description, body } = req.body.article;
+    const { title = '', description = '', body = '' } = req.body.article;
     const authorId = req.body.decoded.id;
     const updateField = [];
-    if (title && title.trim()) updateField.push('title');
-    if (description && description.trim()) updateField.push('description');
-    if (body && body.trim()) updateField.push('body');
+    const subcategoryId = req.body.subcategoryDetails
+      ? req.body.subcategoryDetails.id : null;
+
+    if (title.trim()) updateField.push('title');
+    if (description.trim()) updateField.push('description');
+    if (body.trim()) updateField.push('body');
+    if (subcategoryId) updateField.push('subcategoryId');
+
     Article.update(
-      { title, description, body },
+      {
+        title, description, body, subcategoryId,
+      },
       {
         where: { slug: req.params.slug, authorId },
         returning: true,

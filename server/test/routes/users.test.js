@@ -374,7 +374,7 @@ describe('Testing user routes', () => {
             firstName: 'Naruto',
             lastName: 'Uzumaki',
             email: 'johnny@mail.com',
-            username: 'John Doe',
+            username: 'johndoe',
             password: '1qQw@123',
           }
         })
@@ -396,7 +396,7 @@ describe('Testing user routes', () => {
             firstName: 'Naruto',
             lastName: 'Uzumaki',
             email: 'johnDoe@mail.com',
-            username: 'John Doe',
+            username: 'johndoe',
             password: '11qQw@123',
           }
         })

@@ -43,6 +43,9 @@ const validationErrors = {
     required: 'Comment body is required',
     string: 'Comment body must be a string',
   },
+  subcategory: {
+    string: 'Subcategory must be a string',
+  },
 };
 
 const signupRules = (userInput) => {
@@ -168,6 +171,7 @@ const createArticleRules = (userInput) => {
     title: 'required|string',
     description: 'required|string',
     body: 'required|string',
+    subcategory: 'string',
   };
   // Setting up customized descriptive messages
   const validation = new Validator(userInput, rules, {
@@ -177,6 +181,7 @@ const createArticleRules = (userInput) => {
     'string.description': validationErrors.description.string,
     'required.body': validationErrors.body.required,
     'string.body': validationErrors.body.string,
+    'string.subcategory': validationErrors.subcategory.string,
   });
   if (validation.fails()) {
     return validation.errors.all();
@@ -189,12 +194,14 @@ const updateArticleRules = (userInput) => {
     title: 'string',
     description: 'string',
     body: 'string',
+    subcategory: 'string',
   };
   // Setting up customized descriptive messages
   const validation = new Validator(userInput, rules, {
     'string.title': validationErrors.title.string,
     'string.description': validationErrors.description.string,
     'string.body': validationErrors.body.string,
+    'string.subcategory': validationErrors.subcategory.string,
   });
   if (validation.fails()) {
     return validation.errors.all();
