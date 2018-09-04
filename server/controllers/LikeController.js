@@ -1,8 +1,11 @@
 import db from '../database/models';
 import helper from '../utils/helpers/likeControllerHelper';
 import errorHelper from '../utils/helpers/errorHelper';
+import notificationService from '../utils/services/notificationService';
 
 const { Article, ArticleLike, User } = db;
+
+const { notify } = notificationService;
 
 /**
  * This class contains static methods for liking and unliking
@@ -26,7 +29,7 @@ class LikeController {
     const { decoded: user } = req.body;
     Article.findOne({
       where: { slug },
-      attributes: ['id', 'title', 'slug'],
+      attributes: ['id', 'title', 'slug', 'authorId'],
       include: {
         model: User,
         as: 'author',
@@ -44,6 +47,10 @@ class LikeController {
         attributes: [['updatedAt', 'timeLiked']],
       }).then(([, created]) => {
         if (created) {
+          // initialize notification params
+          const { authorId } = article;
+          // notify users of interest
+          notify(article.id, 'likes', user.id, authorId, article.id, null);
           return res.status(201).json({
             data: article.dataValues,
           });

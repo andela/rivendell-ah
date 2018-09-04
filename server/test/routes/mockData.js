@@ -141,7 +141,6 @@ const mockData = {
     body: 'I love my mother very muc',
 
   },
-
   tags1: ['life', 'death', 'music'],
   tags2: [
     'sorrow', 'blood', 'education', 'life', 'death', 'no', 'way',
@@ -151,6 +150,49 @@ const mockData = {
     'sorrw3', 'blod3', 'educa3tin', 'li3f', '89', 'n1', 'wa1',
     'lf3e', '3eath', 'msic3', '1fe', '6eth', '9usc',
   ],
+  notificationUser1: {
+    firstName: 'notification1',
+    lastName: 'notification1',
+    username: 'notification1',
+    email: 'notification1@gmail.com',
+  },
+  notificationUser2: {
+    firstName: 'notification',
+    lastName: 'notification',
+    username: 'notification',
+    email: 'notification@gmail.com',
+  },
+  notificationUser3: {
+    firstName: 'notification2',
+    lastName: 'notification2',
+    username: 'notification2',
+    email: 'notification2@gmail.com',
+  },
+  notificationUser4: {
+    firstName: 'notification4',
+    lastName: 'notification4',
+    username: 'notification4',
+    email: 'notification4@gmail.com',
+  },
+  notificationUser5: {
+    firstName: 'notification5',
+    lastName: 'notification5',
+    username: 'notification5',
+    email: 'notification5@gmail.com',
+  },
+  notificationUser6: {
+    firstName: 'notification6',
+    lastName: 'notification6',
+    username: 'notification6',
+    email: 'notification6@gmail.com',
+  },
+  notifUser1Article: {
+    title: 'article notification',
+    description: 'article notification',
+    body: 'article notification',
+    slug: 'article-notification',
+    authorId: 'fbf941c0-aa8c-11e8-a375-d331f0a71356',
+  }
 };
 
 export default mockData;

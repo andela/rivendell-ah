@@ -3,7 +3,7 @@ import chai from 'chai'
 import faker from 'faker'
 import chaiHttp from 'chai-http'
 import dotenv from 'dotenv';
-import server from '../../index';
+import { server } from '../../index';
 import models from '../../database/models';
 import tokenService from '../../utils/services/tokenService';
 import { User } from '../../database/models';
@@ -18,10 +18,6 @@ let idTest;
 
 let user6Token;
 describe('Testing user routes', () => {
-  after((done) => {
-    models.sequelize.close();
-    done();
-  });
 
   before((done) => {
     chai.request(server)
@@ -75,7 +71,7 @@ describe('Testing user routes', () => {
         });
     });
     it('Should not verify user account if user is not registered (not in the database)', (done) => {
-      const token = tokenService.generateToken({ id: 0 }, 60 * 20);
+      const token = tokenService.generateToken({ id: 'fbf941c0-aaaa-bbbb-cccc-d331f0a71365' }, 60 * 20);
       chai.request(server)
         .get(`${baseUrl}verify/${token}`)
         .end((err, res) => {
@@ -639,7 +635,7 @@ describe('Testing user routes', () => {
     it('Should return user not found for unsaved email', (done) => {
       const token = tokenService.generateToken(
         { 
-          id: -166,
+          id: 'fbf941c0-aaaa-bbbb-cccc-d331f0a71365',
         }, 60 * 20);
       chai.request(server)
         .put('/api/users/reset-password')

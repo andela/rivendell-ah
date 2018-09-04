@@ -7,6 +7,7 @@ import hashPassword from '../utils/services/passwordHashService';
 import emailTemplates from '../utils/services/emailTemplates';
 import errorHelper from '../utils/helpers/errorHelper';
 import userControllerHelper from '../utils/helpers/userControllerHelper';
+import notificationService from '../utils/services/notificationService';
 
 const { User } = models;
 
@@ -280,6 +281,7 @@ class UserController {
         if (!user) {
           errorHelper.throwError('User not found', 404);
         }
+        notificationService.readNotification(req, next);
         return res.status(200)
           .json({
             profile: userControllerHelper.userDetails(user),

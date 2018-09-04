@@ -1,8 +1,30 @@
 /* eslint-disable */
+const uuid = require('uuid/v1');
 
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('Users', [{
+      id: uuid(),
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'John Doe',
+      email: 'johnDoe1@mail.com',
+      hash: '1qQw@123',
+      verified: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },{
+      id: uuid(),
+      firstName: 'John',
+      lastName: 'Doe',
+      username: 'johndoe',
+      email: 'johnDoe@mail.com',
+      hash: '1qQw@123',
+      verified: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },{
+      id: uuid(),
       firstName: 'John',
       lastName: 'Wick',
       username: 'black',
@@ -13,6 +35,7 @@ module.exports = {
       updatedAt: new Date(),
     },
     {
+      id: 'fbf941c0-aa8c-11e8-a375-d331f0a71365',
       firstName: 'Strawhat',
       lastName: 'Luffy',
       username: 'strawhat',
@@ -23,6 +46,7 @@ module.exports = {
       updatedAt: new Date(),
     },
     {
+      id: uuid(),
       firstName: 'Naruto',
       lastName: 'Uzumaki',
       username: 'naruto',
@@ -33,6 +57,7 @@ module.exports = {
       updatedAt: new Date()
     },
     {
+      id: uuid(),
       firstName: 'Charlie',
       lastName: 'Brown',
       username: 'charlieBrown',
@@ -43,6 +68,7 @@ module.exports = {
       updatedAt: new Date()
     },
     {
+      id: uuid(),
       firstName: 'Charlie1',
       lastName: 'Brown1',
       username: 'charlieBrown1',
@@ -53,6 +79,7 @@ module.exports = {
       updatedAt: new Date()
     },
     {
+      id: uuid(),
       firstName: 'Mary',
       lastName: 'Jane',
       username: 'maryJane',
@@ -63,6 +90,7 @@ module.exports = {
       updatedAt: new Date()
     },
     {
+      id: uuid(),
       firstName: 'Fatty',
       lastName: 'Lee',
       username: 'fattylee',
@@ -72,7 +100,8 @@ module.exports = {
       verified: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    },{
+    }, {
+      id: uuid(),
       firstName: 'Gadath',
       lastName: 'Pillow',
       username: 'pillowgad',
@@ -82,7 +111,8 @@ module.exports = {
       verified: false,
       createdAt: new Date(),
       updatedAt: new Date(),
-    },{
+    }, {
+      id: uuid(),
       firstName: 'Krista',
       lastName: 'Kolo',
       username: 'kolokris',
@@ -92,7 +122,8 @@ module.exports = {
       verified: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    },{
+    }, {
+      id: uuid(),
       firstName: 'Zebedee',
       lastName: 'Macus',
       username: 'zebedee',
@@ -102,13 +133,80 @@ module.exports = {
       verified: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    },{
+    }, {
+      id: uuid(),
       firstName: 'Tager',
       lastName: 'Author',
       username: 'authorTager',
       hash: 'R!vend1elLl121//',
       verified: true,
       email: 'authortager@gmail.com',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, {
+      id: 'fbf941c0-aa8c-11e8-a375-d331f0a71356',
+      firstName: 'notification',
+      lastName: 'notification',
+      username: 'notification',
+      email: 'notification@gmail.com',
+      hash: '12345',
+      salt: '12345',
+      verified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, {
+      id: uuid(),
+      firstName: 'notification1',
+      lastName: 'notification1',
+      username: 'notification1',
+      email: 'notification1@gmail.com',
+      hash: '12345',
+      salt: '12345',
+      verified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, {
+      id: uuid(),
+      firstName: 'notification2',
+      lastName: 'notification2',
+      username: 'notification2',
+      email: 'notification2@gmail.com',
+      hash: '12345',
+      salt: '12345',
+      verified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, {
+      id: uuid(),
+      firstName: 'notification6',
+      lastName: 'notification6',
+      username: 'notification6',
+      email: 'notification6@gmail.com',
+      hash: '12345',
+      salt: '12345',
+      verified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, {
+      id: uuid(),
+      firstName: 'notification4',
+      lastName: 'notification4',
+      username: 'notification4',
+      email: 'notification4@gmail.com',
+      hash: '12345',
+      salt: '12345',
+      verified: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, {
+      id: uuid(),
+      firstName: 'notification5',
+      lastName: 'notification5',
+      username: 'notification5',
+      email: 'notification5@gmail.com',
+      hash: '12345',
+      salt: '12345',
+      verified: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     }], {});

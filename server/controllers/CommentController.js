@@ -2,10 +2,13 @@ import models from '../database/models';
 import commentCtrlHelper from '../utils/helpers/commentCtrlHelper';
 import errorHelper from '../utils/helpers/errorHelper';
 import queryHelper from '../utils/helpers/queryHelper';
+import notificationService from '../utils/services/notificationService';
 
 const {
   Article, Comment, sequelize,
 } = models;
+
+const { notify } = notificationService;
 
 /**
  * The controller for comment routes
@@ -22,9 +25,13 @@ class CommentController {
     const { body: commentBody } = req.body.comment;
     const { slug } = req.params;
     const { id, username, image } = req.user;
+    let articleAuthorId;
+    let articleId;
     Article.findOne({ where: { slug } })
       .then((article) => {
         if (!article) errorHelper.throwError('Article not found', 404);
+        articleAuthorId = article.authorId;
+        articleId = article.id;
         return article.createComment({
           body: commentBody.trim(),
           authorId: id,
@@ -32,6 +39,14 @@ class CommentController {
         });
       })
       .then(({ dataValues }) => {
+        // initialize notification params
+        const entityId = dataValues.id;
+        const type = 'create comment';
+        const sourceId = dataValues.authorId;
+        const authorId = articleAuthorId;
+        const commentId = dataValues.id;
+        // notify users of interest
+        notify(entityId, type, sourceId, authorId, articleId, commentId);
         const comment = Object
           .assign(dataValues, { author: { username, image } });
         res.status(201).json({ comment });
@@ -112,6 +127,7 @@ class CommentController {
         }
         const comment = commentCtrlHelper.parseComments(rawComments)[0];
         const commentsCount = rawComments[0].totalCount;
+        notificationService.readNotification(req, next);
         return res.status(200)
           .json({ comment, commentsCount });
       }).catch(next);

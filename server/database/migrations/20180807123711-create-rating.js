@@ -3,10 +3,10 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Ratings', {
       id: {
-        autoIncrement: true,
-        primaryKey: true,
         allowNull: false,
-        type: Sequelize.INTEGER,
+        primaryKey: true,
+        type: Sequelize.UUID,
+        defaults: Sequelize.UUIDV4,
       },
       rating: {
         type: Sequelize.INTEGER,
@@ -14,7 +14,7 @@ module.exports = {
       },
       userId: {
         allowNull: false,
-        type: Sequelize.INTEGER,
+        type: Sequelize.UUID,
         reference: {
           model: 'User',
           key: 'id',

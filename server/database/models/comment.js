@@ -1,11 +1,17 @@
 export default (sequelize, DataTypes) => {
   const Comment = sequelize.define('Comment', {
+    id: {
+      allowNull: false,
+      primaryKey: true,
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+    },
     body: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     parentId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.UUID,
       allowNull: true,
     },
     type: {

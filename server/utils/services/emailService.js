@@ -32,12 +32,13 @@ module.exports = {
   * @param {String} html - the body of the email
   * @returns {Object} mailing options
   */
-  mailOptions(recipient, subject, html) {
+  mailOptions(recipient, subject, html, bcc) {
     return {
       from: 'no-reply@authors-haven.com',
       to: recipient,
       subject: subject,
       html: html,
+      bcc,
     };
   },
   /**

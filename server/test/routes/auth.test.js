@@ -5,7 +5,7 @@ import chai, { expect, use, request } from 'chai';
 import { describe, it, before } from 'mocha';
 import { internet, name } from 'faker';
 import chaiHttp from 'chai-http';
-import server from '../../index';
+import { server } from '../../index';
 
 const SIGN_UP_ROUTE = '/api/users';
 const LOGIN_ROUTE = '/api/users/login';

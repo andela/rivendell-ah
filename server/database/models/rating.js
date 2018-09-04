@@ -2,12 +2,18 @@
 module.exports = (sequelize, DataTypes) => {
   const Rating = sequelize.define(
     'Rating', {
+      id: {
+        allowNull: false,
+        primaryKey: true,
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+      },
       rating: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
       userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
         reference: {
           model: 'User',
