@@ -1,24 +1,24 @@
-/* eslint-disable */
-import chai from 'chai'
-import faker from 'faker'
-import chaiHttp from 'chai-http'
+
+import {
+  describe, it, before,
+} from 'mocha';
+import chai from 'chai';
+import faker from 'faker';
+import chaiHttp from 'chai-http';
 import dotenv from 'dotenv';
 import { server } from '../../index';
-import models from '../../database/models';
-import tokenService from '../../utils/services/tokenService';
 import { User } from '../../database/models';
+import tokenService from '../../utils/services/tokenService';
 import mockData from './mockData';
 
-const {user1, user2, user3} = mockData
+const { user1, user2, user3 } = mockData;
 const { expect } = chai;
 const baseUrl = '/api/users/';
 dotenv.config();
 chai.use(chaiHttp);
-let idTest; 
-
+let idTest;
 let user6Token;
 describe('Testing user routes', () => {
-
   before((done) => {
     chai.request(server)
       .post(`${baseUrl}`)
@@ -28,8 +28,8 @@ describe('Testing user routes', () => {
           lastName: mockData.user6.lastName,
           username: mockData.user6.username,
           email: mockData.user6.email,
-          password: mockData.user6.password
-          }
+          password: mockData.user6.password,
+        },
       })
       .end((err, res) => {
         user6Token = res.body.user.token;
@@ -46,8 +46,8 @@ describe('Testing user routes', () => {
             lastName: 'Uzumaki',
             username: 'username',
             password: 'R!vendell12',
-            email: 'username12@gmail.com'
-          }
+            email: 'username12@gmail.com',
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(201);
@@ -118,6 +118,164 @@ describe('Testing user routes', () => {
         });
     });
   });
+
+
+  describe('Loging in a user with the route(/api/users/login', () => {
+    before((done) => {
+      User.create(mockData.existingUser)
+        .then(() => done());
+    });
+
+    describe('when user email is missing in the request', (done) => {
+      it('should return an error message and 400 status code', (done) => {
+        chai.request(server)
+          .post('/api/users/login')
+          .send({
+            user: {
+              password: 'giberish1010',
+            },
+          }).end((err, res) => {
+            expect(res.body)
+              .to.be.an('object');
+            expect(res.body.errors)
+              .property('email')
+              .to.be.an('array');
+
+            expect(res.body.errors.email[0])
+              .to.equal('Please enter an email in the specified field');
+            done();
+          });
+      });
+    });
+
+    describe('when user object is missing in the request', () => {
+      it('should return an error message and 400 status code', (done) => {
+        chai.request(server)
+          .post('/api/users/login')
+          .send()
+          .end((err, res) => {
+            expect(res.body)
+              .to.be.an('object');
+            expect(res.body.errors)
+              .to.be.an('object');
+            expect(res.body.errors)
+              .property('message')
+              .to.equal('Please provide the required fields');
+            done();
+          });
+      });
+    });
+
+    describe('when an empty object is sent in the request', () => {
+      it('should return an error message and 400 status code', (done) => {
+        chai.request(server)
+          .post('/api/users/login')
+          .send({})
+          .end((err, res) => {
+            expect(res.body)
+              .to.be.an('object');
+            expect(res.body.errors)
+              .to.be.an('object');
+            expect(res.body.errors)
+              .property('message')
+              .to.equal('Please provide the required fields');
+            done();
+          });
+      });
+    });
+    describe('when user password is missing in the request', () => {
+      it('should return an error message and 400 status code', (done) => {
+        chai.request(server)
+          .post('/api/users/login')
+          .send({
+            user: {
+              emial: 'emial@mail.com',
+            },
+          }).end((err, res) => {
+            expect(res.body)
+              .to.be.an('object');
+            expect(res.body.errors)
+              .property('password')
+              .to.be.an('array');
+
+            expect(res.body.errors.password[0])
+              .to.equal('Please enter a password in the specified field');
+            done();
+          });
+      });
+    });
+    describe('when the user does not exists', () => {
+      it('should return an error message and status 400', (done) => {
+        chai.request(server)
+          .post('/api/users/login')
+          .send({
+            user: {
+              email: 'unknownweamil@email.com',
+              password: 'giberish1010',
+            },
+          }).end((err, res) => {
+            expect(res.body)
+              .to.be.an('object');
+            expect(res.status)
+              .to.equal(400);
+            expect(res.body.errors)
+              .to.be.an('object');
+            expect(res.body.errors)
+              .property('message')
+              .to.equal('email and password combination not found');
+            done();
+          });
+      });
+    });
+
+    describe('when the user exists but the password is invalid', () => {
+      it('should return an error message and status 400', (done) => {
+        chai.request(server)
+          .post('/api/users/login')
+          .send({
+            user: {
+              email: mockData.existingUser.email,
+              password: 'giberish1010',
+            },
+          }).end((err, res) => {
+            expect(res.body)
+              .to.be.an('object');
+            expect(res.status)
+              .to.equal(400);
+            expect(res.body.errors)
+              .to.be.an('object');
+            expect(res.body.errors)
+              .property('message')
+              .to.equal('email and password combination not found');
+            done();
+          });
+      });
+    });
+    describe('when the user exists', () => {
+      it('should log the user in and return his token', (done) => {
+        chai.request(server)
+          .post('/api/users/login')
+          .send({ user: mockData.existingUser })
+          .end((err, res) => {
+            expect(res.body)
+              .to.be.an('object');
+            const { user } = res.body;
+
+            expect(user.firstName)
+              .to.equal(mockData.existingUser.firstName);
+            expect(user.lastName)
+              .to.equal(mockData.existingUser.lastName);
+            expect(user.email)
+              .to.equal(mockData.existingUser.email);
+            expect(user.bio)
+              .to.equal(mockData.existingUser.bio);
+            expect(user.token)
+              .to.be.a('string');
+            done();
+          });
+      });
+    });
+  });
   describe('Requesting for verification mail resend on route(/api/user/verify/resend-email)', () => {
     it('Should not resend email if email was not provided', (done) => {
       chai.request(server)
@@ -134,7 +292,7 @@ describe('Testing user routes', () => {
       chai.request(server)
         .post(`${baseUrl}verify/resend-email`)
         .send({
-          email: 'not-a-valid-email'
+          email: 'not-a-valid-email',
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -148,7 +306,7 @@ describe('Testing user routes', () => {
       chai.request(server)
         .post(`${baseUrl}verify/resend-email`)
         .send({
-          email: faker.internet.email()
+          email: faker.internet.email(),
         })
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -162,7 +320,7 @@ describe('Testing user routes', () => {
       chai.request(server)
         .post(`${baseUrl}verify/resend-email`)
         .send({
-          email: user3.email
+          email: user3.email,
         })
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -182,13 +340,13 @@ describe('Testing user routes', () => {
             email: '',
             username: '',
             password: '',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.errors.username[0]).to.equal('Please enter a username in the specified field');
           expect(res.body.errors.username.length).to.equal(1);
-          expect(res.body.errors.email[0]).to.equal( 'Please enter an email in the specified field');
+          expect(res.body.errors.email[0]).to.equal('Please enter an email in the specified field');
           expect(res.body.errors.email.length).to.equal(1);
           expect(res.body.errors.password[0]).to.equal('Please enter a password in the specified field');
           expect(res.body.errors.password.length).to.equal(1);
@@ -209,7 +367,7 @@ describe('Testing user routes', () => {
             email: 'jenny@mail.com',
             username: 'jenny',
             password: 'P@ssword1',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -261,7 +419,7 @@ describe('Testing user routes', () => {
             email: 'jenny@mail.com',
             username: 'jenny',
             password: 'P@ssword1',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -283,7 +441,7 @@ describe('Testing user routes', () => {
             email: 'jennymail.com',
             username: 'jenny',
             password: '1qQw@123',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -303,12 +461,13 @@ describe('Testing user routes', () => {
             email: 'jenny@mail.com',
             username: 'jenny',
             password: '1234@',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.errors.password[0]).to.equal(
-            'Your password must include an uppercase and lowercase alphabet, a number and a special character');
+            'Your password must include an uppercase and lowercase alphabet, a number and a special character',
+          );
           expect(res.body.errors.password[1]).to.equal('Password entered should have minimum of 8 characters');
           expect(res.body.errors.password.length).to.equal(2);
           done();
@@ -326,12 +485,13 @@ describe('Testing user routes', () => {
             username: 'jenny',
             password: `12344444444443343444444434643543@1234444444444334344444
             4434643543@12344444444443343444444434643543@12344444444443343444444434643543@`,
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body.errors.password[0]).to.equal(
-            'Your password must include an uppercase and lowercase alphabet, a number and a special character');
+            'Your password must include an uppercase and lowercase alphabet, a number and a special character',
+          );
           expect(res.body.errors.password[1]).to.equal('Password entered should have maximum of 100 characters');
           expect(res.body.errors.password.length).to.equal(2);
           done();
@@ -350,7 +510,7 @@ describe('Testing user routes', () => {
             email: 'johnDoe@mail.com',
             username: 'jenny',
             password: '1qQw@123',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -372,7 +532,7 @@ describe('Testing user routes', () => {
             email: 'johnny@mail.com',
             username: 'johndoe',
             password: '1qQw@123',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -394,7 +554,7 @@ describe('Testing user routes', () => {
             email: 'johnDoe@mail.com',
             username: 'johndoe',
             password: '11qQw@123',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -411,8 +571,8 @@ describe('Testing user routes', () => {
         .post('/api/users/forgot-password')
         .send({
           user: {
-            email: mockData.user4.email
-          }
+            email: mockData.user4.email,
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(200);
@@ -421,18 +581,18 @@ describe('Testing user routes', () => {
           done();
         });
     });
-    
+
     it('Should return undefined for missing email field', (done) => {
       chai.request(server)
         .post('/api/users/forgot-password')
         .send({
           user: {
             email: '',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
-          expect(res.body.errors.email[0]).to.equal( 'Please enter an email in the specified field');
+          expect(res.body.errors.email[0]).to.equal('Please enter an email in the specified field');
           expect(res.body.errors.email.length).to.equal(1);
           done();
         });
@@ -443,7 +603,7 @@ describe('Testing user routes', () => {
         .send({
           user: {
             email: 'jndnej',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -451,14 +611,14 @@ describe('Testing user routes', () => {
           done();
         });
     });
-    
+
     it('Should return user not found for unsaved email', (done) => {
       chai.request(server)
         .post('/api/users/forgot-password')
         .send({
           user: {
-            email: mockData.user5.email
-          }
+            email: mockData.user5.email,
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -471,11 +631,10 @@ describe('Testing user routes', () => {
   });
 
   describe('TEST GET /api/users/reset-password', () => {
-
     it('Should return success on a valid token', (done) => {
       const token = tokenService.generateToken({ username: mockData.user4.username, email: mockData.user4.email }, 60 * 30);
       chai.request(server)
-        .get('/api/users/reset-password?token=' + token)
+        .get(`/api/users/reset-password?token=${token}`)
         .end((err, res) => {
           expect(res.status).to.equal(200);
           expect(res.body).to.haveOwnProperty('message')
@@ -505,8 +664,8 @@ describe('Testing user routes', () => {
           user: {
             email: 'fakeemail@gmail.com',
             username: 'fakeusername',
-            password: '123456'
-          }
+            password: '123456',
+          },
         })
         .end((err, res) => {
           done();
@@ -519,7 +678,7 @@ describe('Testing user routes', () => {
         .put('/api/users/reset-password')
         .send({
           user: {
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -537,7 +696,7 @@ describe('Testing user routes', () => {
         .set('Authorization', '')
         .send({
           user: {
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -548,24 +707,24 @@ describe('Testing user routes', () => {
         });
     });
     it('Should return error for an invalid token', (done) => {
-          const token = tokenService.generateToken({ username: mockData.user4.username, email: mockData.user4.email }, 60 * 30);
-          chai.request(server)
-            .put('/api/users/reset-password')
-            .set('Authorization', 'hjjbjbj')
-            .send({
-              user: {
-                password: '12345',
-                confirm: '12345',
-              }
-            })
-            .end((err, res) => {
-              expect(res.status).to.equal(401);
-              expect(res.body).to.haveOwnProperty('errors')
-                .to.haveOwnProperty('message')
-                .to.equal('Invalid token');
-              done();
-            });
+      const token = tokenService.generateToken({ username: mockData.user4.username, email: mockData.user4.email }, 60 * 30);
+      chai.request(server)
+        .put('/api/users/reset-password')
+        .set('Authorization', 'hjjbjbj')
+        .send({
+          user: {
+            password: '12345',
+            confirm: '12345',
+          },
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(401);
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.haveOwnProperty('message')
+            .to.equal('Invalid token');
+          done();
         });
+    });
 
     it('Should return error for a missing and empty password field', (done) => {
       const token = tokenService.generateToken({ username: mockData.user4.username, email: mockData.user4.email }, 60 * 30);
@@ -575,7 +734,7 @@ describe('Testing user routes', () => {
         .send({
           user: {
             password: '',
-          }
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(400);
@@ -586,75 +745,78 @@ describe('Testing user routes', () => {
     });
 
     it('Should return error for password mismatch', (done) => {
-    const token = tokenService.generateToken({
-      username: mockData.user4.username, email: mockData.user4.email 
-    },
-    60 * 30);
-    chai.request(server)
-      .put('/api/users/reset-password')
-      .set('Authorization', token)
-      .send({
-        user: {
-          password: '12345Qh@',
-          confirm: '12346',
-        }
-      })
-      .end((err, res) => {
-        expect(res.status).to.equal(409);
-        expect(res.body).to.haveOwnProperty('errors')
-          .to.haveOwnProperty('message')
-          .to.equal('Password does not match');
-        done();
-      });
-    });
-    it('Should return password updated on success', (done) => {
-    User.findOne({ where: { email: 'fattty@gmail.com' }})
-      .then((user) => {
-        idTest =user.id;
-        const token = tokenService.generateToken(
-          { 
-            id: user.id 
-          }, 60 * 20);
-        chai.request(server)
-          .put('/api/users/reset-password')
-          .set('Authorization', token)
-          .send({
-            user: {
-              password: '12345Qh@',
-              confirm: '12345Qh@',
-            }
-          })
-          .end((err, res) => {
-            expect(res.status).to.equal(200);
-            expect(res.body).to.haveOwnProperty('message')
-              .to.equal('Password updated!');
-            done();
-          });
-        })
-    });
-    it('Should return user not found for unsaved email', (done) => {
-      const token = tokenService.generateToken(
-        { 
-          id: 'fbf941c0-aaaa-bbbb-cccc-d331f0a71365',
-        }, 60 * 20);
+      const token = tokenService.generateToken({
+        username: mockData.user4.username, email: mockData.user4.email,
+      },
+      60 * 30);
       chai.request(server)
         .put('/api/users/reset-password')
         .set('Authorization', token)
         .send({
-          user: { 
+          user: {
+            password: '12345Qh@',
+            confirm: '12346',
+          },
+        })
+        .end((err, res) => {
+          expect(res.status).to.equal(409);
+          expect(res.body).to.haveOwnProperty('errors')
+            .to.haveOwnProperty('message')
+            .to.equal('Password does not match');
+          done();
+        });
+    });
+    it('Should return password updated on success', (done) => {
+      User.findOne({ where: { email: 'fattty@gmail.com' } })
+        .then((user) => {
+          idTest = user.id;
+          const token = tokenService.generateToken(
+            {
+              id: user.id,
+            }, 60 * 20,
+          );
+          chai.request(server)
+            .put('/api/users/reset-password')
+            .set('Authorization', token)
+            .send({
+              user: {
+                password: '12345Qh@',
+                confirm: '12345Qh@',
+              },
+            })
+            .end((err, res) => {
+              expect(res.status).to.equal(200);
+              expect(res.body).to.haveOwnProperty('message')
+                .to.equal('Password updated!');
+              done();
+            });
+        });
+    });
+    it('Should return user not found for unsaved email', (done) => {
+      const token = tokenService.generateToken(
+        {
+          id: 'fbf941c0-aaaa-bbbb-cccc-d331f0a71365',
+        }, 60 * 20,
+      );
+
+      chai.request(server)
+        .put('/api/users/reset-password')
+        .set('Authorization', token)
+        .send({
+          user: {
             password: 'cindsanf)0FSSC',
-            confirm: 'cindsanf)0FSSC'
-          }
+            confirm: 'cindsanf)0FSSC',
+          },
         })
         .end((err, res) => {
           expect(res.status).to.equal(404);
           expect(res.body).to.haveOwnProperty('errors')
             .to.haveOwnProperty('message')
             .to.equal('User not found');
-            done();
-          });
-      });
+          done();
+        });
     });
+  });
   describe('Making a request to get a profile, GET \'/profiles/:username\'', () => {
     it('Should return error 404 if the provided username is not in the database', (done) => {
       chai.request(server)
@@ -667,7 +829,7 @@ describe('Testing user routes', () => {
           done();
         });
     });
-    it('Should return a corresponding profile provided the provided username is in the database', (done) =>{
+    it('Should return a corresponding profile provided the provided username is in the database', (done) => {
       chai.request(server)
         .get(`/api/profiles/${mockData.user1.username}`)
         .end((err, res) => {
@@ -709,8 +871,8 @@ describe('Testing user routes', () => {
         .put('/api/user')
         .send({
           user: {
-            password: 'invalid-password'
-          }
+            password: 'invalid-password',
+          },
         })
         .set({ authorization: user6Token })
         .end((err, res) => {
@@ -719,7 +881,7 @@ describe('Testing user routes', () => {
             .to.haveOwnProperty('password')
             .to.be.an('array');
           expect(res.body.errors.password[0])
-          .to.equal('Your password must include an uppercase and lowercase alphabet, a number and a special character');
+            .to.equal('Your password must include an uppercase and lowercase alphabet, a number and a special character');
           done();
         });
     });
@@ -729,8 +891,8 @@ describe('Testing user routes', () => {
         .put('/api/user')
         .send({
           user: {
-            username: mockData.user1.username
-          }
+            username: mockData.user1.username,
+          },
         })
         .set({ authorization: user6Token })
         .end((err, res) => {
@@ -742,12 +904,12 @@ describe('Testing user routes', () => {
         });
     });
     it('Should return error 404 if the email parsed from the token doesn\'t exist in the database', (done) => {
-      const token = tokenService.generateToken({ email: 'invalidemail@gmail.com' }, 60 * 10 );
+      const token = tokenService.generateToken({ email: 'invalidemail@gmail.com' }, 60 * 10);
       chai.request(server)
         .put('/api/user')
         .set({ authorization: token })
         .send({
-          user: {}
+          user: {},
         })
         .end((err, res) => {
           expect(res.status).to.equal(404);
@@ -762,8 +924,8 @@ describe('Testing user routes', () => {
         .put('/api/user')
         .send({
           user: {
-            username: mockData.user6.username
-          }
+            username: mockData.user6.username,
+          },
         })
         .set({ authorization: user6Token })
         .end((err, res) => {
@@ -774,20 +936,48 @@ describe('Testing user routes', () => {
           done();
         });
     });
+
+    it('should be able to update all user data at once', (done) => {
+      chai.request(server)
+        .put('/api/user')
+        .send({
+          user: mockData.user8,
+        })
+        .set({ authorization: user6Token })
+        .end((err, res) => {
+          expect(res.status).to.equal(200);
+          expect(res.body).to.haveOwnProperty('user')
+            .to.haveOwnProperty('username')
+            .to.equal(mockData.user8.username);
+          expect(res.body).to.haveOwnProperty('user')
+            .to.haveOwnProperty('firstName')
+            .to.equal(mockData.user8.firstName);
+          expect(res.body).to.haveOwnProperty('user')
+            .to.haveOwnProperty('lastName')
+            .to.equal(mockData.user8.lastName);
+          expect(res.body).to.haveOwnProperty('user')
+            .to.haveOwnProperty('image')
+            .to.equal(mockData.user8.image);
+          expect(res.body).to.haveOwnProperty('user')
+            .to.haveOwnProperty('bio')
+            .to.equal(mockData.user8.bio);
+          done();
+        });
+    });
     it('Should throw an error if the provided first name has characters less than 2', (done) => {
       chai.request(server)
         .put('/api/user')
         .send({
           user: {
-            firstName: 'a'
-          }
+            firstName: 'a',
+          },
         })
         .set({ authorization: user6Token })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.haveOwnProperty('errors')
             .to.haveOwnProperty('firstName')
-            .to.be.an('array')
+            .to.be.an('array');
           expect(res.body.errors.firstName[0])
             .to.equal('first name entered should have minimum of 2 characters');
           done();
@@ -798,15 +988,15 @@ describe('Testing user routes', () => {
         .put('/api/user')
         .send({
           user: {
-            lastName: 'a'
-          }
+            lastName: 'a',
+          },
         })
         .set({ authorization: user6Token })
         .end((err, res) => {
           expect(res.status).to.equal(400);
           expect(res.body).to.haveOwnProperty('errors')
             .to.haveOwnProperty('lastName')
-            .to.be.an('array')
+            .to.be.an('array');
           expect(res.body.errors.lastName[0])
             .to.equal('last name entered should have minimum of 2 characters');
           done();
@@ -817,8 +1007,8 @@ describe('Testing user routes', () => {
         .put('/api/user')
         .send({
           user: {
-            bio: 'this is it boiz'
-          }
+            bio: 'this is it boiz',
+          },
         })
         .set({ authorization: user6Token })
         .end((err, res) => {
@@ -834,13 +1024,13 @@ describe('Testing user routes', () => {
         .put('/api/user')
         .send({
           user: {
-            password: 'P@ssword12'
-          }
+            password: 'P@ssword12',
+          },
         })
         .set({ authorization: user6Token })
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body).to.haveOwnProperty('user')
+          expect(res.body).to.haveOwnProperty('user');
           done();
         });
     });
@@ -849,8 +1039,8 @@ describe('Testing user routes', () => {
         .put('/api/user')
         .send({
           user: {
-            image: 'image-link'
-          }
+            image: 'image-link',
+          },
         })
         .set({ authorization: user6Token })
         .end((err, res) => {
@@ -866,8 +1056,8 @@ describe('Testing user routes', () => {
         .put('/api/user')
         .send({
           user: {
-            lastName: 'lastName-update'
-          }
+            lastName: 'lastName-update',
+          },
         })
         .set({ authorization: user6Token })
         .end((err, res) => {
@@ -883,8 +1073,8 @@ describe('Testing user routes', () => {
         .put('/api/user')
         .send({
           user: {
-            firstName: 'firstName-update'
-          }
+            firstName: 'firstName-update',
+          },
         })
         .set({ authorization: user6Token })
         .end((err, res) => {
@@ -915,7 +1105,7 @@ describe('Testing user routes', () => {
         .get('/api/profiles?search=strawhat&limit=10&page=1')
         .end((err, res) => {
           expect(res.status).to.equal(200);
-          expect(res.body).to.be.an('array')
+          expect(res.body).to.be.an('array');
           expect(res.body[0].username).to.equal('strawhat');
           done();
         });

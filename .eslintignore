@@ -1,6 +1,6 @@
 /node_modules/**
 /coverage/**
 server/database/**
-server/test/**
+server/test/**/*.test.js
 .env
 

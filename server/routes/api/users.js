@@ -7,12 +7,6 @@ import AuthMiddleware from '../../utils/middleware/AuthMiddleware';
 
 const router = Router();
 
-router.get(
-  '/user',
-  AuthMiddleware.authenticateUser,
-  UserController.get,
-);
-
 router.put(
   '/user',
   AuthMiddleware.authenticateUser,
