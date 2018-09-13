@@ -194,8 +194,7 @@ class UserController {
       }
       const token = tokenService
         .generateToken({ id: user.id, username: user.username }, 1800);
-      let url = `${process.env.BASEURL}`;
-      url += `/api/users/reset-password?token=${token}`;
+      const url = `${req.headers.origin}/reset-password?token=${token}`;
       const mailOptions = emailService.mailOptions(
         user.email,
         "Authors Heaven's account token",

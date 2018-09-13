@@ -1,5 +1,6 @@
 
 import crypto from 'crypto';
+import url from 'url';
 import { User } from '../database/models'; //eslint-disable-line
 import tokenService from '../utils/services/tokenService';
 
@@ -64,19 +65,19 @@ class OauthController {
       id: user.id,
       email: user.email,
     }, '3d');
-    res.json({
-      status: 'success',
-      data: {
+
+    res.redirect(url.format({
+      pathname: process.env.CLIENT_PATH,
+      query: {
         email: user.email,
         image: user.image,
         firstName: user.firstName,
         lastName: user.lastName,
         bio: user.bio,
-        token,
         username: user.username,
+        token,
       },
-      message: 'Successfully authenticated the user',
-    });
+    }));
   }
 }
 
