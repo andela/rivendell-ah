@@ -1,5 +1,5 @@
-
 import { Tag } from '../../database/models'; //eslint-disable-line
+
 /**
  * Abstracts the article controller's response
  * @param {Object} article the article object gotten from the database
@@ -59,6 +59,13 @@ const includeSubcategories = (model, where) => ({
   model,
   as: 'subcategories',
   attributes: ['id', 'name'],
+  where,
+});
+
+const includeArticleLike = (model, where) => ({
+  model,
+  as: 'likes',
+  attributes: ['userId'],
   where,
 });
 
@@ -132,4 +139,5 @@ export default {
   includeSubcategories,
   articleAttributes,
   includeTag,
+  includeArticleLike,
 };

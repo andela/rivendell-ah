@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import dateRange from '../helpers/filterDateRangeHelper';
 
-// get the sequelize operator object
+// get the sequelize operator  object
 const { Op } = Sequelize;
 
 const articleFilters = (req, res, next) => {
@@ -13,17 +13,17 @@ const articleFilters = (req, res, next) => {
     [Op.and]: [
       {
         title: {
-          [Op.like]: `%${title}%`,
+          [Op.iLike]: `%${title}%`,
         },
       },
       {
         description: {
-          [Op.like]: `%${description}%`,
+          [Op.iLike]: `%${description}%`,
         },
       },
       {
         body: {
-          [Op.like]: `%${body}%`,
+          [Op.iLike]: `%${body}%`,
         },
       },
       {
@@ -35,26 +35,26 @@ const articleFilters = (req, res, next) => {
   };
   req.filterByAuthorAttributes = {
     username: {
-      [Op.like]: `%${username.toLowerCase()}%`,
+      [Op.iLike]: `%${username}%`,
     },
     firstName: {
-      [Op.like]: `%${firstName}%`,
+      [Op.iLike]: `%${firstName}%`,
     },
     lastName: {
-      [Op.like]: `%${lastName}%`,
+      [Op.iLike]: `%${lastName}%`,
     },
   };
 
   req.filterBySubcategoryAttributes = {
     name: {
-      [Op.like]: `%${subcategory.toUpperCase()}%`,
+      [Op.iLike]: `%${subcategory}%`,
     },
   };
 
   if (tag) {
     req.filterByTag = {
       name: {
-        [Op.like]: `%${tag}%`,
+        [Op.iLike]: `%${tag}%`,
       },
     };
   }

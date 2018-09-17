@@ -97,7 +97,7 @@ class LikeController {
    * This method retrieves information of all the
    * likes of a particular article from the database.
    * It uses the extractId function from the likeHelper.
-   * @param {object} req contians the request informations
+   * @param {object} req contains the request informations
    * sent to the server
    * @param {object} res used to send a response back to the
    * client
@@ -119,7 +119,7 @@ class LikeController {
         as: 'user',
         attributes: [
           'firstName', 'lastName',
-          'bio', 'image', 'id',
+          'bio', 'image', 'id', 'username',
         ],
       }],
       attributes: [['updatedAt', 'timeLiked']],
@@ -128,9 +128,6 @@ class LikeController {
       offset,
     }).then((returnedObj) => {
       const { rows, count } = returnedObj;
-      if (!count) {
-        return res.status(204).send();
-      }
       return res.status(200).json({
         data: rows,
         totalLikes: count,

@@ -41,24 +41,23 @@ router.delete(
   ArticleController.deleteArticle,
 );
 
-
+// routes for  liking/unliking articles
 router.post(
   '/articles/:slug/like',
   auth.authenticateUser,
   auth.verifyUser,
   LikeController.likeArticle,
 );
-
+// route to unlike an article
 router.delete(
   '/articles/:slug/like',
   auth.authenticateUser,
   auth.verifyUser,
   LikeController.unlikeArticle,
 );
+// route for getting likes information about an article
 router.get(
   '/articles/:slug/like',
-  auth.authenticateUser,
-  auth.verifyUser,
   LikeController.getArticleLikes,
 );
 
