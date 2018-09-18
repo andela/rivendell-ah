@@ -33,7 +33,7 @@ class ArticleController {
    */
   static createArticle(req, res, next) {
     const {
-      title, description, body, tags,
+      title, description, body, tags, image,
     } = req.body.article;
     // generating a slug
     const id = uuid();
@@ -44,10 +44,10 @@ class ArticleController {
     const subcategoryName = req.body.subcategoryDetails
       ? req.body.subcategoryDetails.name : 'OTHERS';
     const {
-      username, bio, image,
+      username, bio,
     } = req.user;
     const newArticle = {
-      id, slug, title, description, body, authorId, subcategoryId,
+      id, slug, title, description, body, authorId, subcategoryId, image,
     };
     Article.create(newArticle)
       .then((article) => {
