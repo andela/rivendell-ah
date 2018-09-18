@@ -32,7 +32,22 @@ const ratingAttributes = sequelize => [
     'averageRating'],
 ];
 
+/**
+ * Abstract the attributes requested on the rating controller
+ * @param {Object} model model instance
+ * @returns {object} user model attributes
+ */
+const includeRaters = model => ({
+  model,
+  as: 'user',
+  attributes: [
+    'firstName', 'lastName', 'email', 'username', 'image',
+  ],
+});
+
+
 export default {
   validateRating,
   ratingAttributes,
+  includeRaters,
 };

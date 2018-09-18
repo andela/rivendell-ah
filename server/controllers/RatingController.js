@@ -3,7 +3,7 @@ import models from '../database/models';
 import errorHelper from '../utils/helpers/errorHelper';
 import ratingControllerHelper from '../utils/helpers/ratingControllerHelper';
 
-const { Article, Rating } = models;
+const { Article, Rating, User } = models;
 
 /**
  * @class RatingController
@@ -122,7 +122,16 @@ class RatingController {
     return Article
       .find({
         where: { slug },
-        include: [{ model: Rating, as: 'ratings' }],
+        include: [
+          {
+            model: Rating,
+            as: 'ratings',
+            include: [
+              ratingControllerHelper
+                .includeRaters(User),
+            ],
+          },
+        ],
       }).then((article) => {
         if (!article) errorHelper.throwError('Article not found', 404);
         return Rating.findOne({
