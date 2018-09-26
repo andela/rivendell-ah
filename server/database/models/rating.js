@@ -46,7 +46,7 @@ module.exports = (sequelize, DataTypes) => {
     Rating.belongsTo(models.Article, {
       foreignKey: 'articleId',
       onDelete: 'CASCADE',
-      as: 'artticle',
+      as: 'article',
     });
     // associate rating with user
     Rating.belongsTo(models.User, {

@@ -491,3 +491,17 @@ describe('Article rating', () => {
     });
   });
 });
+
+describe('Navigating to /articles/top-rated', () => {
+  it('Should get the top rated articles', (done) => {
+    chai.request(server)
+      .get('/api/articles/top-rated')
+      .end((err, res) => {
+        expect(res.status).to.equal(200);
+        expect(res.body).to.haveOwnProperty('topRated')
+          .to.be.an('array').length
+          .to.be.greaterThan(0);
+        done();
+      });
+  });
+});

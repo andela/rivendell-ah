@@ -130,6 +130,21 @@ describe('Testing likes routes /api/auth/:slug/like', () => {
             });
         });
       });
+      describe('Making a request to /articles/favorites', () => {
+        it('Should return the articles liked by a logged in user', (done) => {
+          request(server)
+            .get('/api/articles/favorites')
+            .set('Authorization', token)
+            .end((err, res) => {
+              expect(res.status).to.equal(200);
+              expect(res.body).to.haveOwnProperty('favoriteArticles')
+                .to.be.an('array')
+              expect(res.body.favoriteArticles.length).to.be.greaterThan(0);
+              done();
+            });
+        });
+      })
+      
 
       describe('when the user had liked the article', () => {
         it('should return a status code of 200 and article informations', (done) => {
