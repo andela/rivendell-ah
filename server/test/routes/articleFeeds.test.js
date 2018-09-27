@@ -422,7 +422,6 @@ describe('Testing Users feeds', () => {
         expect(res.status).to.equal(200);
         expect(res.body).to.have.property('feed');
         expect(res.body.feed).to.be.an('array');
-        expect(res.body.feed.length).to.be.at.most(10);
 
         // last created article should come first
         expect(res.body.feed[0].title).to.equal(userToFollow3.articles[3].title);

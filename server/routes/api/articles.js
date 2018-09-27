@@ -19,6 +19,17 @@ router.post(
 );
 
 router.get(
+  '/articles/top-rated',
+  ArticleController.getTopRatedArticles,
+);
+
+router.get(
+  '/articles/favorites',
+  auth.authenticateUser, auth.verifyUser,
+  ArticleController.getFavoriteArticles,
+);
+
+router.get(
   '/articles/:slug',
   ArticleController.getArticle,
 );

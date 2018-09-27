@@ -7,9 +7,10 @@ import errorHelper from '../utils/helpers/errorHelper';
 import setPaginationParameters
   from '../utils/helpers/setPaginationParametersHelper';
 import notificationService from '../utils/services/notificationService';
+import queryHelper from '../utils/helpers/queryHelper';
 
 const {
-  Article, User, Tag, Subcategory, Follow, ArticleLike,
+  Article, User, Tag, Subcategory, Follow, sequelize, ArticleLike,
 } = models;
 
 const { notify } = notificationService;
@@ -224,8 +225,8 @@ class ArticleController {
    */
   static getUserFeed(req, res, next) {
     let { limit } = req.query;
+    const { page } = req.query;
     const { id: userId } = req.user;
-    limit = parseInt(limit, 10);
     Follow
       .findAll({
         where: {
@@ -241,17 +242,75 @@ class ArticleController {
         // get an array of userId the user is following
         const followings = [];
         followingArray.map(following => followings.push(following.followingId));
+        limit = limit <= 20 ? limit : 20;
+        const offset = page > 0 ? ((page - 1) * limit) : 0;
 
         // user sequelize option operators 'or'
         const { or } = Sequelize.Op;
         return Article
-          .findAll({
+          .findAndCountAll({
             where: { [or]: [{ authorId: followings }] },
             order: [['createdAt', 'DESC']],
-            limit: limit || 10,
+            limit,
+            offset,
+            include: {
+              model: User,
+              as: 'author',
+              attributes: ['username', 'bio', 'image'],
+            },
           })
-          .then(allArticle => res.status(200).json({ feed: allArticle }));
+          .then((allArticle) => {
+            res.status(200).json({
+              feed: allArticle.rows,
+              articlesCount: allArticle.count,
+            });
+          });
       })
+      .catch(next);
+  }
+
+  /**
+   * Get the top rated articles
+   * @param {Object} req the request body
+   * @param {Object} res the response body
+   * @param {function} next a call to the next function
+   * @returns {Object} the response body
+   */
+  static getTopRatedArticles(req, res, next) {
+    sequelize
+      .query(queryHelper.getTopRatedArticles(), {
+        type: sequelize.QueryTypes.SELECT,
+      })
+      .then(ratings => res.status(200).json({ topRated: ratings }))
+      .catch(next);
+  }
+
+  /**
+   * Get all liked articles of a logged in user
+   * @param {Object} req the request body
+   * @param {Object} res the response body
+   * @param {function} next a call to the next function
+   * @returns {Object} the response body
+   */
+  static getFavoriteArticles(req, res, next) {
+    const { id: userId } = req.user;
+    ArticleLike.findAll({
+      where: { userId },
+      limit: 20,
+      include: {
+        model: Article,
+        as: 'article',
+        orderBy: [['createdAt', 'DESC']],
+        attributes: ['slug', 'title', 'description',
+          'image', 'image', 'createdAt', 'updatedAt'],
+        include: {
+          model: User,
+          as: 'author',
+          attributes: ['username', 'bio', 'image'],
+        },
+      },
+    })
+      .then(likes => res.status(200).json({ favoriteArticles: likes }))
       .catch(next);
   }
 }
