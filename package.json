@@ -17,6 +17,9 @@
     "posttest": "sequelize --env test db:migrate:undo:all",
     "migrate": "sequelize db:migrate",
     "undo:migrate": "sequelize db:migrate:undo:all",
+    "seed": "sequelize db:seed --seed 20180724134320-categories.js",
+    "seed2": "sequelize db:seed --seed 20180724134927-subcategories.js ",
+    "migrating": "sequelize db:migrate:undo:all && sequelize db:migrate",
     "unmigrate-test": "sequelize --env test db:migrate:undo:all",
     "migrate-staging": " sequelize --env staging db:migrate:undo:all && sequelize --env staging  db:migrate"
   },
