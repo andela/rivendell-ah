@@ -53,30 +53,15 @@ describe('Testing likes routes /api/auth/:slug/like', () => {
   });
 
 
-  describe('if the user has not yet been verified tries to like an article', () => {
-    it('should return a 403(Unauthorized)', (done) => {
-      request(server)
-        .get(likeRoute)
-        .set('Authorization', unverifiedToken)
-        .end((err, res) => {
-          expect(res)
-            .property('status').to.equal(403);
-          expect(res.body)
-            .property('errors')
-            .property('message')
-            .to.equal('Your account has not been verified');
-          done();
-        });
-    });
-  });
+  
   describe('when like informations are retrieved when no one has liked the article', () => {
-    it('should return a status code of 204 ', (done) => {
+    it('should return a status code of 200 ', (done) => {
       request(server)
         .get(likeRoute)
         .set('Authorization', token)
         .end((err, res) => {
           expect(res)
-            .property('status').to.equal(204);
+            .property('status').to.equal(200);
           done();
         });
     });
@@ -178,31 +163,6 @@ describe('Testing likes routes /api/auth/:slug/like', () => {
   });
 
   describe('when a user retrieves like information via GET /api/auth/:slug/like', () => {
-    describe('when authentication is not provided', () => {
-      it('should return a 401(Unauthorized', (done) => {
-        request(server)
-          .get(likeRoute)
-          .end((err, res) => {
-            expect(res)
-              .property('status').to.equal(401);
-            done();
-          });
-      });
-      it('should return an error object in the body', (done) => {
-        request(server)
-          .get(likeRoute)
-          .end((err, res) => {
-            expect(res.body)
-              .to.be.an('object');
-            expect(res.body)
-              .property('errors')
-              .property('message')
-              .to.equal('Authentication failed');
-            done();
-          });
-      });
-    });
-
     describe('when authentication is provided', () => {
       it('should return a status code of 200 and a data property', (done) => {
         request(server)

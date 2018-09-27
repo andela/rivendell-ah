@@ -69,6 +69,7 @@ class OauthController {
     res.redirect(url.format({
       pathname: process.env.CLIENT_PATH,
       query: {
+        id: user.id,
         email: user.email,
         image: user.image,
         firstName: user.firstName,

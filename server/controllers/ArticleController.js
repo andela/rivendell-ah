@@ -9,7 +9,7 @@ import setPaginationParameters
 import notificationService from '../utils/services/notificationService';
 
 const {
-  Article, User, Tag, Subcategory, Follow,
+  Article, User, Tag, Subcategory, Follow, ArticleLike,
 } = models;
 
 const { notify } = notificationService;
@@ -88,6 +88,7 @@ class ArticleController {
         articleControllerHelper.includeAuthor(User),
         articleControllerHelper.includeTag(Tag),
         articleControllerHelper.includeSubcategory(Subcategory),
+        articleControllerHelper.includeArticleLike(ArticleLike),
       ],
       attributes: articleControllerHelper
         .articleAttributes(),
@@ -98,6 +99,7 @@ class ArticleController {
       const articleObj = article.dataValues;
       articleObj.tags = articleControllerHelper
         .formatTagResponse(article.tags);
+      articleObj.likesCount = articleObj.likes.length;
       notificationService.readNotification(req, next);
       return res.status(200).json({
         article: articleObj,
@@ -129,6 +131,7 @@ class ArticleController {
           .includeTag(Tag, req.filterByTag),
         articleControllerHelper
           .includeSubcategory(Subcategory, req.filterBySubcategoryAttributes),
+        articleControllerHelper.includeArticleLike(ArticleLike),
       ],
       attributes: articleControllerHelper
         .articleAttributes(true),
@@ -138,6 +141,7 @@ class ArticleController {
           const articleObj = dataValues;
           articleObj.tags = articleControllerHelper
             .formatTagResponse(articleObj.tags);
+          articleObj.likesCount = articleObj.likes.length;
           return articleObj;
         });
       return res.status(200).json({
