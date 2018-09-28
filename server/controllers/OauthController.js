@@ -46,7 +46,14 @@ class OauthController {
     User.findOrCreate({
       where: { email },
       defaults: user,
-    }).then(([foundOrCreatedUser]) => {
+    }).then(([foundOrCreatedUser, created]) => {
+      if (!created && !foundOrCreatedUser.verified) {
+        foundOrCreatedUser
+          .update({ verified: true })
+          .then((updatedUser) => {
+            done(null, updatedUser.dataValues);
+          });
+      }
       done(null, foundOrCreatedUser.dataValues);
     });
   }
@@ -76,6 +83,7 @@ class OauthController {
         lastName: user.lastName,
         bio: user.bio,
         username: user.username,
+        verified: user.verified,
         token,
       },
     }));
