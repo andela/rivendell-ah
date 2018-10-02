@@ -46,6 +46,17 @@ const validationErrors = {
   subcategory: {
     string: 'Subcategory must be a string',
   },
+  reportType: {
+    required: 'A report must contain a type',
+    string: 'Must be a string',
+    min: 'Report type must have a length of at least 5 characters',
+    max: 'Report type must not be more than 30 characters',
+  },
+  reportDescription: {
+    required: 'A report must contain a description',
+    string: 'Must be a string',
+    min: 'Report description must have a length of at least 10 characters',
+  },
 };
 
 const signupRules = (userInput) => {
@@ -209,6 +220,24 @@ const updateArticleRules = (userInput) => {
   return false;
 };
 
+
+const createReportArticleRules = (report) => {
+  // Validator rules
+  const rules = {
+    description: ['required', 'min:10'],
+    type: ['required', 'min:10', 'max:30'],
+  };
+  // Setting up customized descriptive messages
+  const validation = new Validator(report, rules, {
+    'string.description': validationErrors.reportDescription,
+    'string.type': validationErrors.reportType,
+  });
+  if (validation.fails()) {
+    return validation.errors.all();
+  }
+  return false;
+};
+
 const createCommentRules = (commentInput) => {
   // Validator rules
   const rules = {
@@ -249,5 +278,6 @@ export default {
   updateArticleRules,
   createCommentRules,
   updateCommentRules,
+  createReportArticleRules,
   loginRules,
 };
