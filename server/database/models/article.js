@@ -44,6 +44,13 @@ export default (sequelize, DataTypes) => {
       onUpdate: 'CASCADE',
       as: 'likes',
     });
+
+    Article.hasMany(models.Report, {
+      foreignKey: 'articleId',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+      as: 'reports',
+    });
     Article.hasMany(models.Comment, {
       as: 'comments',
       foreignKey: 'articleId',

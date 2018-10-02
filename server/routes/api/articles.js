@@ -7,7 +7,9 @@ import ratingMiddleware from '../../utils/middleware/ratingMiddleware';
 import articleFilters from '../../utils/middleware/articleFilters';
 
 import LikeController from '../../controllers/LikeController';
+import ReportController from '../../controllers/ReportController';
 import filterTag from '../../utils/middleware/filterTag';
+import ReportValidator from '../../utils/middleware/validator/ReportValidator';
 
 const router = Router();
 router.post(
@@ -92,6 +94,14 @@ router.put(
 router.get(
   '/articles/:slug/rating',
   RatingController.getArticleRating,
+);
+
+router.post(
+  '/articles/:slug/report',
+  auth.authenticateUser,
+  auth.verifyUser,
+  ReportValidator.createReport,
+  ReportController.reportArticle,
 );
 
 export default router;
